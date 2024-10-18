@@ -1,0 +1,36 @@
+{
+  "name": "my-daw-projects",
+  "version": "1.0.0",
+  "description": "My DAW Project",
+  "author": "CoreSignal",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"next dev\" \"electron .\"",
+    "build": "next build && electron-builder",
+    "start": "concurrently \"next start\" \"electron .\""
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.4",
+    "@mui/material": "^6.1.4",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "electron-is-dev": "^3.0.1",
+    "glob": "^11.0.0",
+    "global": "^4.4.0",
+    "json2csv": "^6.0.0-alpha.2",
+    "next": "^14.2.15",
+    "path": "^0.12.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rimraf": "^6.0.1",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "electron": "^33.0.1",
+    "electron-builder": "^25.1.8"
+  }
+}
