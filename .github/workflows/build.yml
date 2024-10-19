@@ -26,9 +26,10 @@ jobs:
         run: npm run build
 
       - name: Package Electron app for macOS
-        run: npx electron-builder --mac
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: npx electron-builder --mac --publish always
 
-      # Upload the built macOS .dmg file as an artifact using v3
       - name: Upload macOS build artifacts
         uses: actions/upload-artifact@v3
         with:
