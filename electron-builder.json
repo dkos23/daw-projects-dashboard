@@ -1,6 +1,6 @@
 {
   "appId": "com.mydaw.projects",
-  "productName": "My DAW Projects",
+  "productName": "DAW Projects Dashboard",
   "files": [
     "electron/",
     "out/",
@@ -14,6 +14,13 @@
     "output": "dist",
     "buildResources": "public/icons"
   },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "dkos23",
+      "repo": "my-daw-projects"
+    }
+  ],
   "win": {
     "target": [
       {
@@ -29,13 +36,31 @@
   },
   "mac": {
     "target": "dmg",
-    "icon": "public/icons/favicon.png"
+    "icon": "public/icons/daw_app_icon.icns",
+    "category": "public.app-category.music",
+    "hardenedRuntime": true,
+    "entitlements": "build/entitlements.mac.plist",
+    "gatekeeperAssess": false
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ]
   },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "My DAW Projects"
+    "shortcutName": "DAW Projects Dashboard"
   }
 }

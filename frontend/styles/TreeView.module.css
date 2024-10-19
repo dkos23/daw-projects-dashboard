@@ -1,0 +1,30 @@
+
+.tree-svg {
+  width: 100%;
+  height: 100%;
+  height: 100%;
+  background-color: #121212;
+}
+
+.link {
+  fill: none;
+  stroke: #609bc2; /* Light blue links */
+  stroke-width: 2px;
+}
+
+.node circle {
+  fill: #90caf9; /* Light blue circles */
+  stroke: #ffffff; /* White outline for the nodes */
+  stroke-width: 2px;
+}
+
+.node text {
+  font-family: 'Roboto', sans-serif;
+  /* font: 14px sans-serif; */
+  font-size: 12px;
+  fill: #993cf0; /* White text */
+}
+
+.node text:hover {
+  fill: #90caf9;
+}

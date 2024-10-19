@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TextField, TableSortLabel, Box, CircularProgress, Button } from '@mui/material';
-// import axios from 'axios';
+import TreeView from './TreeView';
+import TreeViewModal from './TreeViewModal';
 import styles from '../styles/DawProjectsTable.module.css';
 import strings from '../../locales/strings';
+
+// DEV use mocked data !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+import mockProjects from '../../public/data/MockProjects';
 
 class DawProjectsTable extends Component {
   constructor(props) {
@@ -17,8 +21,11 @@ class DawProjectsTable extends Component {
       loading: true,
       fileCount: 0,
       fileExtension: '.als',
+      showTreeViewModal: false,
     };
-    // Bind the exportToCsv function to this class component
+    // Bind the functions to this class component
+    this.openTreeViewModal = this.openTreeViewModal.bind(this);
+    this.closeTreeViewModal = this.closeTreeViewModal.bind(this);
     this.exportToCsv = this.exportToCsv.bind(this);
   }
 
@@ -42,6 +49,15 @@ class DawProjectsTable extends Component {
     this.setState({ fileExtension }, () => {
       this.fetchProjectFiles();  // Call fetchProjectFiles after the state is updated
     });
+  }
+
+  openTreeViewModal() {
+    this.setState({ showTreeViewModal: true });
+  }
+
+  // Close Tree View Modal
+  closeTreeViewModal() {
+    this.setState({ showTreeViewModal: false });
   }
 
   // Handle opening file explorer
@@ -177,9 +193,13 @@ class DawProjectsTable extends Component {
     );
   };
 
+
   render() {
-    const { projects, searchTerm, sortConfig, loading, fileCount } = this.state;
+    const { projects, searchTerm, sortConfig, loading, fileCount, showTreeViewModal } = this.state;
     const { language } = this.props;
+
+    // Log the projects state right before rendering !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    console.log("Projects being passed to TreeView: ", projects);
 
     // Dynamically load strings based on the selected language
     const langStrings = strings[language] || strings['en'];
@@ -217,6 +237,14 @@ class DawProjectsTable extends Component {
             <Typography className={styles['total-projects']}>
               {langStrings.totalProjectsFound} {fileCount}
             </Typography>
+
+            {/* Button to open Tree View Modal */}
+            <Button
+              className={styles['export-button']}
+              onClick={this.openTreeViewModal}
+            >
+              {langStrings.showTreeView}
+            </Button>
 
             <Button
               className={styles['export-button']}
@@ -301,6 +329,14 @@ class DawProjectsTable extends Component {
             </TableContainer>
           </div>
         )}
+
+        {/* Tree View Modal */}
+        <TreeViewModal
+          open={showTreeViewModal}  // Controlled by state
+          onClose={this.closeTreeViewModal}  // Modal can be closed
+          data={mockProjects}  // Mocked data for tree view
+        />
+
       </div>
     );
   }
