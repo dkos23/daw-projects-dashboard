@@ -24,13 +24,12 @@ class AbletonProjectsTable extends Component {
 
   componentDidMount() {
     const selectedDAW = localStorage.getItem('selectedDAW') || 'Ableton';
-    let fileExtension = '.als'; // Default is Ableton
+    let fileExtension = '.als';
 
     if (selectedDAW === 'StudioOne') {
       fileExtension = '.song';
     } else if (selectedDAW === 'Bitwig') {
       fileExtension = '.bwproject';
-      // fileExtension = '.dawproject';
     } else if (selectedDAW === 'Cubase') {
       fileExtension = '.cpr';
     }

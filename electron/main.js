@@ -16,7 +16,7 @@ function createWindow() {
     height: 900,
     minWidth: 1000,
     minHeight: 600,
-    icon: path.join(__dirname, '../public/icons/dkos23_icon.ico'),
+    icon: path.join(__dirname, '../public/icons/daw_app_icon_no_bg.ico'),
     title: "My DAW Projects",
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -26,24 +26,24 @@ function createWindow() {
     }
   });
 
+  // Load static HTML in production or in development
   const startUrl = app.isPackaged
-    ? `file://${path.join(__dirname, '../out/settings.html')}`  // Load static HTML in production
-    : 'http://localhost:3000/settings';  // Load in development
+    ? `file://${path.join(__dirname, '../out/settings.html')}`
+    : 'http://localhost:3000/settings';
 
   
   mainWindow.loadURL(startUrl);
 
   // Send system locale to renderer process
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('set-locale', systemLocale);  // Send locale to renderer
+    mainWindow.webContents.send('set-locale', systemLocale);
   });
 
-  // Custom Menu Template
   const menuTemplate = [
     {
       label: 'File',
       submenu: [
-        { role: 'quit' }, // Default quit action
+        { role: 'quit' },
       ],
     },
     {
@@ -86,7 +86,7 @@ function createWindow() {
           label: 'About',
           click: () => {
             console.log("About clicked, sending 'open-about-dialog' event");
-            mainWindow.webContents.send('open-about-dialog'); // Trigger an in-app "About" dialog (use IPC)
+            mainWindow.webContents.send('open-about-dialog');
           },
         },
       ],

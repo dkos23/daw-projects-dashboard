@@ -1,6 +1,8 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, Typography, Button, Box, CssBaseline } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Typography, Button, CssBaseline } from '@mui/material';
+import Image from 'next/image';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import styles from '../styles/AboutDialog.module.css';
 import strings from '../../locales/strings';
 
 const darkTheme = createTheme({
@@ -28,34 +30,46 @@ const AboutDialog = ({ open, onClose, language = 'en' }) => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Dialog open={open} onClose={onClose} PaperProps={{ style: { backgroundColor: '#121212', color: '#ffffff' } }}>
-        <DialogTitle>{langStrings.aboutMyDawProjects}</DialogTitle>
+      <Dialog open={open} onClose={onClose} PaperProps={{ className: styles.dialogPaper }}>
+        {/* Icon added below the aboutApp section */}
+        <div className={styles.iconContainer}>
+          <Image
+              src="/icons/daw_app_icon_no_bg_256.png"
+              alt="About Icon"
+              width={80}
+              height={80}
+              className={styles.icon}
+            />
+        </div>
+        {/* <DialogTitle>{langStrings.aboutMyDawProjects}</DialogTitle> */}
         <DialogContent>
           {/* <Typography variant="body1" gutterBottom>
             My DAW Projects Dashboard v1.0
           </Typography> */}
-          <Typography variant="body2" gutterBottom>
+          <Typography variant="body2" className={styles.typography} gutterBottom>
             {langStrings.aboutApp}
           </Typography>
-          <Typography variant="body2" gutterBottom>
-          {langStrings.aboutFeatures.title}
-            <ul>
+          <Typography variant="body2" className={styles.typography} gutterBottom>
+            {langStrings.aboutFeatures.title}
+          </Typography>
+          <div>
+            <ul className={styles.featureList}>
               {langStrings.aboutFeatures.list.map((feature, index) => (
                 <li key={index}>{feature}</li>
               ))}
             </ul>
-          </Typography>
-          <Typography variant="body2" gutterBottom>
+          </div>
+          <Typography variant="body2" className={styles.typography} gutterBottom>
             Developed by @CoreSignal <br />
             Credits to: nukearts <br />
             Copyright © 2024
           </Typography>
         </DialogContent>
-        <Box display="flex" justifyContent="center" p={2}>
+        <div className={styles.buttonContainer}>
           <Button variant="contained" color="primary" onClick={onClose}>
             {langStrings.close}
           </Button>
-        </Box>
+        </div>
       </Dialog>
     </ThemeProvider>
   );

@@ -1,0 +1,36 @@
+.dialogPaper {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+  }
+  
+  .dialogTitle {
+    color: #ffffff;
+  }
+  
+  .typography {
+    color: #b0bec5;
+  }
+  
+  .featureList {
+    margin-top: 8px;
+    padding-left: 20px;
+    list-style-type: disc;
+    color: #b0bec5;
+  }
+  
+  .buttonContainer {
+    display: flex;
+    justify-content: center;
+    padding: 16px; /* Equivalent to p={2} in MUI */
+  }
+  
+  .iconContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+    margin-top: 16px;
+  }
+  
+  .icon {
+    border-radius: 50%; /* Makes the image circular */
+  }

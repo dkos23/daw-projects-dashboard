@@ -43,6 +43,7 @@ async function extractTempoFromAls(filePath) {
   }
 }
 
+// TODO ?????????????????????????????????????????????????????????????????
 // Function to extract tempo from Cubase's compressed file
 async function extractTempoFromCubase(filePath) {
   try {
@@ -74,7 +75,7 @@ async function extractTempoFromCubase(filePath) {
  */
 async function extractTempoFromBitwig(filePath) {
   const dawproject = "project.xml";
-  let tempo = "[nodawproject file]";
+  let tempo = "[no dawproject file]";
   try {
     // Change the extension to .dawproject
     const dawprojectFilePath = filePath.replace('.bwproject', '.dawproject');
@@ -153,11 +154,12 @@ async function searchFiles(dir, ext) {
   let results = [];
   const list = await fs.readdir(dir, { withFileTypes: true });
   let fileFound = false;
+  let date = "";
 
   for (const file of list) {
     const filePath = path.join(dir, file.name);
 
-    // exclude folders from different DAWs
+    // exclude folders from different DAWs folder structure
     if (
       file.isDirectory() && (
         file.name === "Backup" ||
@@ -168,13 +170,12 @@ async function searchFiles(dir, ext) {
       continue;
     }
 
+    let tempo;
     if (file.isDirectory()) {
       if (!fileFound) {
         results = results.concat(await searchFiles(filePath, ext));
       }
     } else if (file.name.endsWith(ext)) {
-      //TODO
-      let tempo;
       // Call appropriate metadata(tempo extraction) function based on the DAW
       if (ext === '.als') {
         tempo = await extractTempoFromAls(filePath);
@@ -183,11 +184,10 @@ async function searchFiles(dir, ext) {
       } else if (ext === '.bwproject') {
         tempo = await extractTempoFromBitwig(filePath);
       } else if (ext === '.cpr') {
-        tempo = await extractTempoFromCubase(filePath);  // New function for Cubase
+        tempo = await extractTempoFromCubase(filePath);
       }
 
-      // const tempo = await extractTempoFromAls(filePath);
-      const date = await getFileDate(filePath);
+      date = await getFileDate(filePath);
       results.push({ path: filePath, tempo, date });
       fileFound = true;
     }

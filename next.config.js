@@ -4,6 +4,9 @@ module.exports = {
   output: 'export',
   basePath: '',      // Ensures that all assets are loaded from the root path
   assetPrefix: './',
+  images: {
+    unoptimized: true, // Disable image optimization for static exports
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // Polyfill 'global' variable in the browser (renderer) environment

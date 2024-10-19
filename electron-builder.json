@@ -25,11 +25,11 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "public/icons/dkos23_icon.ico"
+    "icon": "public/icons/daw_app_icon_no_bg.ico"
   },
   "mac": {
     "target": "dmg",
-    "icon": "public/icons/dkos23_icon.icns"
+    "icon": "public/icons/favicon.png"
   },
   "nsis": {
     "oneClick": false,
