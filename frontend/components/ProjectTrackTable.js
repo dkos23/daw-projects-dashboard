@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';
 
-class AbletonTrackTable extends Component {
+class ProjectTrackTable extends Component {
   render() {
     const { audioTracks, midiTracks } = this.props;  // Receive props from AbletonDashboard
 
@@ -73,4 +73,4 @@ class AbletonTrackTable extends Component {
   }
 }
 
-export default AbletonTrackTable;
+export default ProjectTrackTable;

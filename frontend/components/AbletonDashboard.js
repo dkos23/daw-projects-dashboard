@@ -3,7 +3,7 @@ import { Container, Typography, Box, AppBar, Toolbar, IconButton, Menu, MenuItem
 import MenuIcon from '@mui/icons-material/Menu';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useRouter } from 'next/router'; 
-import AbletonTrackTable from './AbletonTrackTable';
+import ProjectTrackTable from './ProjectTrackTable';
 import AbletonProjectsTable from './AbletonProjectsTable';
 import styles from '../styles/AbletonDashboard.module.css';
 import strings from '../../locales/strings'; 
@@ -100,8 +100,8 @@ const AbletonDashboard = ({ language }) => {
           {/* AbletonProjectsTable class component */}
           <AbletonProjectsTable language={language} />
 
-          {/* Pass the track data as props to the AbletonTrackTable class component */}
-          {/* <AbletonTrackTable audioTracks={AudioTrack} midiTracks={MidiTrack} /> */}
+          {/* Pass the track data as props to the ProjectTrackTable class component */}
+          {/* <ProjectTrackTable audioTracks={AudioTrack} midiTracks={MidiTrack} /> */}
         </Container>
       </Box>
     </ThemeProvider>

@@ -9,7 +9,7 @@ import AboutDialog from '../frontend/components/AboutDialog';
 
 function MyApp({ Component, pageProps }) {
   const [openAboutDialog, setOpenAboutDialog] = useState(false);
-  const [language, setLanguage] = useState('de');
+  const [language, setLanguage] = useState('en');
 
   // Listen for the 'open-about-dialog' event from the Electron main process
   useEffect(() => {
