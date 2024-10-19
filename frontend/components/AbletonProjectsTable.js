@@ -16,21 +16,40 @@ class AbletonProjectsTable extends Component {
       },
       loading: true,
       fileCount: 0,
+      fileExtension: '.als',
     };
     // Bind the exportToCsv function to this class component
     this.exportToCsv = this.exportToCsv.bind(this);
   }
 
-  // Fetch the ALS project files and tempo from the server on component mount
   componentDidMount() {
-    this.fetchProjectFiles();
+    const selectedDAW = localStorage.getItem('selectedDAW') || 'Ableton';
+    let fileExtension = '.als'; // Default is Ableton
+
+    if (selectedDAW === 'StudioOne') {
+      fileExtension = '.song';
+    } else if (selectedDAW === 'Bitwig') {
+      fileExtension = '.bwproject';
+      // fileExtension = '.dawproject';
+    } else if (selectedDAW === 'Cubase') {
+      fileExtension = '.cpr';
+    }
+    
+    // Fetch project files when component mounts
+    // this.setState({ fileExtension });
+    // this.fetchProjectFiles();
+
+    // Ensure setState is done before calling fetchProjectFiles
+    this.setState({ fileExtension }, () => {
+      this.fetchProjectFiles();  // Call fetchProjectFiles after the state is updated
+    });
   }
 
   // Handle opening file explorer
   handleOpenExplorer = async (filePath) => {
     try {
       // Send a request to Electron backend via IPC to open File Explorer
-      const response = await window.fileOperations.openExplorer(filePath);
+      const response = await window.electronAPI.openExplorer(filePath);
       console.log(response.message);
     } catch (error) {
       console.error('Error opening File Explorer:', error);
@@ -48,7 +67,7 @@ class AbletonProjectsTable extends Component {
       console.log('START_PATH for csv export: ' + startPath);
 
       // Call the Electron backend to export CSV
-      const response = await window.fileOperations.exportToCsv(startPath, this.state.projects);
+      const response = await window.electronAPI.exportToCsv(startPath, this.state.projects);
 
       // console.log(response.message);
 
@@ -70,16 +89,26 @@ class AbletonProjectsTable extends Component {
         return;
       }
 
-      console.log('Using START_PATH:', startPath);
+      // Fetch the file extension from state
+      const { fileExtension } = this.state;
+      const { language } = this.props;
+
+      console.log('Using START_PATH:', startPath + ' - File extension: ' + fileExtension);
 
       // Send the START_PATH to the Electron backend via IPC
-      const results = await window.fileOperations.searchFiles(startPath, '.als');
+      const results = await window.electronAPI.searchFiles(startPath, fileExtension);
       const files = results.map((file) => {
-        const projectName = file.path.split(/[/\\]/).pop().replace('.als', '');
+        const projectName = file.path.split(/[/\\]/).pop().replace(fileExtension, '');
         const fileDate = new Date(file.date);
-        const formattedDate = `${fileDate.getFullYear()}.${String(fileDate.getMonth() + 1).padStart(2, '0')}.${String(
-          fileDate.getDate()
-        ).padStart(2, '0')}`;
+        // const formattedDate = `${fileDate.getFullYear()}.${String(fileDate.getMonth() + 1).padStart(2, '0')}.${String(
+        //   fileDate.getDate()
+        // ).padStart(2, '0')}`;
+        const formattedDate = new Intl.DateTimeFormat(language, {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }).format(fileDate);
+
         return {
           projectName: projectName || 'N/A',
           tempo: file.tempo || 'N/A',
@@ -151,7 +180,10 @@ class AbletonProjectsTable extends Component {
 
   render() {
     const { projects, searchTerm, sortConfig, loading, fileCount } = this.state;
+    const { language } = this.props;
 
+    // Dynamically load strings based on the selected language
+    const langStrings = strings[language] || strings['en'];
     // Apply both filtering and sorting to projects
     const filteredProjects = this.getFilteredProjects(projects);
     const sortedProjects = this.getSortedProjects(filteredProjects);
@@ -161,7 +193,10 @@ class AbletonProjectsTable extends Component {
         {/* Conditionally show description text only when loading */}
         {loading && (
           <Typography variant="body1" className={styles['dashboard-description']}>
-            {strings.en.dashboardText}
+            {langStrings.dashboardText_1}
+            <br></br>
+            <br></br>
+            {langStrings.dashboardText_2}
           </Typography>
         )}
 
@@ -169,7 +204,7 @@ class AbletonProjectsTable extends Component {
         {!loading && (
           <Box display="flex" alignItems="center" justifyContent="space-between" className={styles['search-container']}>
             <TextField
-              label={strings.en.searchProjects}
+              label={langStrings.searchProjects}
               variant="outlined"
               value={searchTerm}
               onChange={this.handleSearchChange}
@@ -181,14 +216,14 @@ class AbletonProjectsTable extends Component {
 
             {/* Total Projects Found  and Export CSV */}
             <Typography className={styles['total-projects']}>
-              {strings.en.totalProjectsFound} {fileCount}
+              {langStrings.totalProjectsFound} {fileCount}
             </Typography>
 
             <Button
               className={styles['export-button']}
               onClick={this.exportToCsv}
             >
-              {strings.en.exportCsv}
+              {langStrings.exportCsv}
             </Button>
           </Box>
         )}
@@ -211,7 +246,7 @@ class AbletonProjectsTable extends Component {
                         direction={sortConfig.direction === 'asc' ? 'asc' : 'desc'}
                         onClick={() => this.handleSort('projectName')}
                       >
-                        {strings.en.noProjectsFound}
+                        {langStrings.projectName}
                       </TableSortLabel>
                     </TableCell>
 
@@ -221,7 +256,7 @@ class AbletonProjectsTable extends Component {
                         direction={sortConfig.direction === 'asc' ? 'asc' : 'desc'}
                         onClick={() => this.handleSort('date')}
                       >
-                        {strings.en.date}
+                        {langStrings.date}
                       </TableSortLabel>
                     </TableCell>
 
@@ -231,7 +266,7 @@ class AbletonProjectsTable extends Component {
                         direction={sortConfig.direction === 'asc' ? 'asc' : 'desc'}
                         onClick={() => this.handleSort('tempo')}
                       >
-                        {strings.en.tempo}
+                        {langStrings.tempo}
                       </TableSortLabel>
                     </TableCell>
 
@@ -242,7 +277,7 @@ class AbletonProjectsTable extends Component {
                   {sortedProjects.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} align="center">
-                        {strings.en.noProjectsFound}
+                        {langStrings.noProjectsFound}
                       </TableCell>
                     </TableRow>
                   ) : (

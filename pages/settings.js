@@ -9,6 +9,10 @@ import {
   Button,
   TextField,
   Box,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -29,44 +33,77 @@ const darkTheme = createTheme({
   },
 });
 
-const Settings = () => {
+const Settings = ({ language }) => {
   const [startPath, setStartPath] = useState("");
-  const [donationAmount, setDonationAmount] = useState("");
   const [startPathError, setStartPathError] = useState('');
+  const [donationAmount, setDonationAmount] = useState("");
+  const [daw, setDaw] = useState("");
   const router = useRouter();
+  const langStrings = strings[language] || strings['en'];
 
-  // Load START_PATH from local storage on component mount
+  // hook to load and save stuff
   useEffect(() => {
     const savedStartPath = localStorage.getItem('startPath');
+    const savedDaw = localStorage.getItem('selectedDAW');
+
     if (savedStartPath) {
       setStartPath(savedStartPath); // Load saved START_PATH if exists
     }
 
+    if (savedDaw) {
+      setDaw(savedDaw);
+    }
+
     // Set document title based on the current language
-    document.title = strings.en.settingsPageTitle;
+    document.title = langStrings.settingsPageTitle;
   }, []);
 
-  // Validation function for the START_PATH field
   const validateStartPath = (path) => {
     if (!path) {
-      return strings.en.startPathEmpty; // Error if empty
+      return langStrings.startPathEmpty; // Error if empty
     }
     // You can add more complex validation logic for file paths if necessary
     if (!/^[A-Za-z]:[\\/]/.test(path)) {
-      return strings.en.invalidPath;
+      return langStrings.invalidPath;
     }
     return ''; // No error
   };
 
+  const validateDonationAmount = (amount) => {
+    // if (!amount) {
+    //   return "Thank you for entering amount > 5 :)";
+    // }
+
+    if (amount <= 5) {
+      return "For negative amount YOU do not get payed :)";
+    }
+    return '';
+  };
+
   const handleSave = () => {
+    // const validationErrorAmount = validateDonationAmount(donationAmount);
+    // if (validationErrorAmount) {
+    //   console.info(validationErrorAmount);  // Show the error
+    //   // return;  // Don't save if validation fails
+    // } else {
+    //   localStorage.setItem('donationAmount', donationAmount);
+    // }
+
     const validationError = validateStartPath(startPath);
     if (validationError) {
       setStartPathError(validationError); // Display error if validation fails
     } else {
       // Save the START_PATH to local storage
       localStorage.setItem('startPath', startPath);
+      
       localStorage.setItem('donationAmount', donationAmount);
-      console.log('Settings saved:', startPath, donationAmount);
+      
+      if (!daw) {
+        setDaw("Ableton");
+      }
+      localStorage.setItem('selectedDAW', daw);
+      
+      console.log('Settings saved:', startPath, donationAmount, daw);
       // Go back to the main page after saving
       router.push('/');
     }
@@ -91,19 +128,19 @@ const Settings = () => {
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6" className={styles["title"]}>
-              Home
+              {langStrings.home}
             </Typography>
           </Toolbar>
         </AppBar>
 
         <Box className={styles["settings-content"]}>
           <Typography variant="h1" className={styles["settings-header"]}>
-            Settings
+            {langStrings.settings}
           </Typography>
 
           {/* Input field for START_PATH */}
           <TextField
-            label={strings.en.enterStartPath}
+            label={langStrings.enterStartPath}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -117,8 +154,24 @@ const Settings = () => {
             className={styles["settings-input"]}
           />
 
+          {/* DAW Dropdown Selection */}
+          <FormControl fullWidth margin="normal" className={styles["settings-input"]}>
+            <InputLabel>{langStrings.selectDaw}</InputLabel>
+            <Select
+              value={daw}
+              label={langStrings.selectDaw}
+              onChange={(e) => setDaw(e.target.value)}  // Set the selected DAW
+              style={{ color: 'white' }}  // White text for dark mode
+            >
+              <MenuItem value="Ableton">Ableton</MenuItem>
+              <MenuItem value="Bitwig">Bitwig</MenuItem>
+              <MenuItem value="StudioOne">Studio One</MenuItem>
+              <MenuItem value="Cubase">Cubase</MenuItem>
+            </Select>
+          </FormControl>
+
           <TextField
-            label={strings.en.enterDonationAmount}
+            label={langStrings.enterDonationAmount}
             variant="outlined"
             type="number"
             fullWidth
@@ -126,7 +179,7 @@ const Settings = () => {
             value={donationAmount}
             onChange={(e) => setDonationAmount(e.target.value)}
             InputProps={{
-              inputProps: { min: 0 },
+              inputProps: { min: 5 },
               style: { color: "white" },
             }}
             className={styles["settings-input"]}
@@ -139,7 +192,7 @@ const Settings = () => {
             onClick={handleSave}
             className={styles["save-button"]}
           >
-            {strings.en.saveButton}
+            {langStrings.saveButton}
           </Button>
         </Box>
 

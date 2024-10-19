@@ -22,21 +22,24 @@ const darkTheme = createTheme({
   },
 });
 
-const AbletonDashboard = () => {
+const AbletonDashboard = ({ language }) => {
+  // const [language, setLanguage] = useState('en');
   const [anchorEl, setAnchorEl] = useState(null);
   const router = useRouter(); // Initialize the Next.js router
 
-  useEffect(() => {
-    // Ensure that this code only runs on the client-side
-    if (typeof window !== 'undefined') {
-      // Any code that uses useState can safely be used here
-    }
-  }, []);
+  const langStrings = strings[language] || strings['en'];
+
+  // useEffect(() => {
+  //   // Ensure that this code only runs on the client-side
+  //   if (typeof window !== 'undefined') {
+  //   }
+  // }, []);
 
   // Update the window title when the component mounts
   useEffect(() => {
-    document.title = strings.en.appName;
-  }, []);
+    document.title = langStrings.appName;
+  }, [langStrings]); // Adding langStrings as a dependency ensures it updates when language changes
+  
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -72,7 +75,7 @@ const AbletonDashboard = () => {
 
             {/* Title */}
             <Typography variant="h6" className={styles['title']}>
-              {strings.en.home}
+              {langStrings.home}
             </Typography>
 
             {/* Additional Menu */}
@@ -91,11 +94,11 @@ const AbletonDashboard = () => {
 
         <Container maxWidth="false" className={styles['dashboard-content']}>
           <Typography variant="h1" className={styles['dashboard-header']}>
-            {strings.en.appName}
+            {langStrings.appName}
           </Typography>
 
           {/* AbletonProjectsTable class component */}
-          <AbletonProjectsTable />
+          <AbletonProjectsTable language={language} />
 
           {/* Pass the track data as props to the AbletonTrackTable class component */}
           {/* <AbletonTrackTable audioTracks={AudioTrack} midiTracks={MidiTrack} /> */}
