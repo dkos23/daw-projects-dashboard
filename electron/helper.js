@@ -192,6 +192,10 @@ async function searchFiles(dir, ext) {
       fileFound = true;
     }
   }
+  // log for debugging :
+  // results.forEach(result => {
+  //   console.log("results: " + JSON.stringify(result,null,2));
+  // });
   return results;
 }
 

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TextField, TableSortLabel, Box, CircularProgress, Button } from '@mui/material';
 // import axios from 'axios';
-import styles from '../styles/AbletonProjectsTable.module.css';
+import styles from '../styles/DawProjectsTable.module.css';
 import strings from '../../locales/strings';
 
-class AbletonProjectsTable extends Component {
+class DawProjectsTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -306,4 +306,4 @@ class AbletonProjectsTable extends Component {
   }
 }
 
-export default AbletonProjectsTable;
+export default DawProjectsTable;

@@ -4,8 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useRouter } from 'next/router'; 
 import ProjectTrackTable from './ProjectTrackTable';
-import AbletonProjectsTable from './AbletonProjectsTable';
-import styles from '../styles/AbletonDashboard.module.css';
+import DawProjectsTable from './DawProjectsTable';
+import styles from '../styles/DawDashboard.module.css';
 import strings from '../../locales/strings'; 
 
 // Create a dark theme using Material-UI
@@ -22,7 +22,7 @@ const darkTheme = createTheme({
   },
 });
 
-const AbletonDashboard = ({ language }) => {
+const DawDashboard = ({ language }) => {
   // const [language, setLanguage] = useState('en');
   const [anchorEl, setAnchorEl] = useState(null);
   const router = useRouter(); // Initialize the Next.js router
@@ -97,8 +97,8 @@ const AbletonDashboard = ({ language }) => {
             {langStrings.appName}
           </Typography>
 
-          {/* AbletonProjectsTable class component */}
-          <AbletonProjectsTable language={language} />
+          {/* DawProjectsTable class component */}
+          <DawProjectsTable language={language} />
 
           {/* Pass the track data as props to the ProjectTrackTable class component */}
           {/* <ProjectTrackTable audioTracks={AudioTrack} midiTracks={MidiTrack} /> */}
@@ -108,4 +108,4 @@ const AbletonDashboard = ({ language }) => {
   );
 };
 
-export default AbletonDashboard;
+export default DawDashboard;

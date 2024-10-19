@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 
 class ProjectTrackTable extends Component {
   render() {
-    const { audioTracks, midiTracks } = this.props;  // Receive props from AbletonDashboard
+    const { audioTracks, midiTracks } = this.props;  // Receive props from DawDashboard
 
     return (
       <div>
