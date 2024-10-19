@@ -1,9 +1,5 @@
 name: Build Electron App for macOS
 
-<<<<<<< HEAD
-=======
-# Trigger the workflow on push to the main branch or on pull requests
->>>>>>> f68675e880169d60622ee21f3ec18b1ed4056ec7
 on:
   push:
     branches:
@@ -12,30 +8,17 @@ on:
 
 jobs:
   build:
-<<<<<<< HEAD
     runs-on: macos-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-=======
-    # Use macOS runner
-    runs-on: macos-latest
-
-    steps:
-      # Checkout the latest code from the repository
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Set up Node.js environment with the specified version
->>>>>>> f68675e880169d60622ee21f3ec18b1ed4056ec7
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '18'
 
-<<<<<<< HEAD
       - name: Install dependencies
         run: npm install
 
@@ -48,23 +31,6 @@ jobs:
       # Upload the built macOS .dmg file as an artifact using v3
       - name: Upload macOS build artifacts
         uses: actions/upload-artifact@v3
-=======
-      # Install npm dependencies
-      - name: Install dependencies
-        run: npm install
-
-      # Build the Next.js app (if needed, or skip this if not required)
-      - name: Build Next.js frontend
-        run: npm run build
-
-      # Build the Electron app for macOS
-      - name: Package Electron app for macOS
-        run: npx electron-builder --mac
-
-      # Upload the built macOS .dmg file as an artifact
-      - name: Upload macOS build artifacts
-        uses: actions/upload-artifact@v2
->>>>>>> f68675e880169d60622ee21f3ec18b1ed4056ec7
         with:
           name: macOS-build
           path: dist/*.dmg
