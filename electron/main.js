@@ -1,9 +1,17 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, shell } = require('electron');
 const path = require('path');
 const { searchFiles, openExplorer, exportToCsv } = require('./helper'); // Import helper functions
 
+let mainWindow;
+
 function createWindow() {
-  const win = new BrowserWindow({
+
+  // Get system locale (this will return something like 'en-US' or 'de')
+  const systemLocale = app.getLocale();
+  console.log("System Locale: ", systemLocale);  // For debugging
+
+
+  mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     minWidth: 1000,
@@ -13,7 +21,8 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      devTools: true
     }
   });
 
@@ -21,7 +30,72 @@ function createWindow() {
     ? `file://${path.join(__dirname, '../out/settings.html')}`  // Load static HTML in production
     : 'http://localhost:3000/settings';  // Load in development
 
-  win.loadURL(startUrl);
+  
+  mainWindow.loadURL(startUrl);
+
+  // Send system locale to renderer process
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('set-locale', systemLocale);  // Send locale to renderer
+  });
+
+  // Custom Menu Template
+  const menuTemplate = [
+    {
+      label: 'File',
+      submenu: [
+        { role: 'quit' }, // Default quit action
+      ],
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+      ],
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forcereload' },
+        { role: 'togglefullscreen' },
+        {
+          label: 'Toggle DevTools',
+          accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+          click: () => {
+            mainWindow.webContents.openDevTools();
+          },
+        },
+      ],
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'Learn More',
+          click: async () => {
+            console.log("Learn More clicked, sending 'openExternal' event");
+            await shell.openExternal('https://dkos23.github.io/ableton-dashboard/');
+          },
+        },
+        {
+          label: 'About',
+          click: () => {
+            console.log("About clicked, sending 'open-about-dialog' event");
+            mainWindow.webContents.send('open-about-dialog'); // Trigger an in-app "About" dialog (use IPC)
+          },
+        },
+      ],
+    },
+  ];
+
+  // Build the menu from the template
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu);
 
   // Close window event
   mainWindow.on('closed', () => {
@@ -29,7 +103,7 @@ function createWindow() {
   });
 }
 
-// IPC handler to search for Ableton .als files
+// IPC handler to search for eg:Ableton .als files
 ipcMain.handle('search-files', async (event, searchPath, extension) => {
   try {
     const results = await searchFiles(searchPath, extension);
