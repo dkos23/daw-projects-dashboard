@@ -17,7 +17,8 @@
   "publish": [
     {
       "provider": "github",
-      "token": "${GH_TOKEN}"
+      "owner": "dkos23",
+      "repo": "my-daw-projects"
     }
   ],
   "win": {
