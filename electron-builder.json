@@ -16,9 +16,7 @@
   },
   "publish": [
     {
-      "provider": "github",
-      "owner": "dkos23",
-      "repo": "my-daw-projects"
+      "provider": "github"
     }
   ],
   "win": {
