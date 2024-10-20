@@ -36,7 +36,7 @@
     "target": "dmg",
     "icon": "public/icons/daw_app_icon.icns",
     "category": "public.app-category.music",
-    "hardenedRuntime": true,
+    "hardenedRuntime": false,
     "entitlements": "build/entitlements.mac.plist",
     "gatekeeperAssess": false
   },
