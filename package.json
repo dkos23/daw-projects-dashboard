@@ -1,7 +1,7 @@
 {
   "name": "my-daw-projects",
   "version": "1.0.0",
-  "description": "My DAW Project",
+  "description": "DAW Project Dashboard",
   "author": "CoreSignal",
   "main": "electron/main.js",
   "scripts": {

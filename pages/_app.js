@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
-// styles
 import '../frontend/styles/globals.css';
 import '../frontend/styles/DawDashboard.module.css';
 import '../frontend/styles/DawProjectsTable.module.css';
 import '../frontend/styles/Settings.module.css';
-// components
 import AboutDialog from '../frontend/components/AboutDialog';
+import config from '../public/app_config.js';
 
 function MyApp({ Component, pageProps }) {
   const [openAboutDialog, setOpenAboutDialog] = useState(false);
-  const [language, setLanguage] = useState('de');
+  const [language, setLanguage] = useState(config.defaultLanguage);
 
   // Listen for the 'open-about-dialog' event from the Electron main process
   useEffect(() => {
@@ -49,16 +48,3 @@ function MyApp({ Component, pageProps }) {
 }
 
 export default MyApp;
-
-
-
-// import '../frontend/styles/globals.css';
-// import '../frontend/styles/DawDashboard.module.css';
-// import '../frontend/styles/DawProjectsTable.module.css';
-// import '../frontend/styles/Settings.module.css';
-
-// function MyApp({ Component, pageProps }) {
-//   return <Component {...pageProps} />;
-// }
-
-// export default MyApp;

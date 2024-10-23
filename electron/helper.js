@@ -31,6 +31,9 @@ async function getFileDate(filePath) {
 
 // Function to extract tempo from Ableton's compressed .als file
 async function extractTempoFromAbleton(filePath) {
+  if (!filePath) {
+    return null;
+  }
   try {
     const alsFilePath = filePath.replace('.als', '.als');
     const alsExists = await fsPromises.access(alsFilePath).then(() => true).catch(() => false);
@@ -355,14 +358,15 @@ async function exportToCsv(startPath, files) {
       path: file.path,
     }));
 
-    const fields = ["projectName", "tempo", "date", "path"];
+    // const fields = ["projectName", "tempo", "date", "path"];
+    const fields = config.csvExportFields;
     const json2csvParser = new Parser({ fields });
     const csv = json2csvParser.parse(csvData);
 
     // If startPath is not provided, use the OS temp directory
     const csvPath = startPath
-      ? path.join(startPath, "My DAW Projects.csv")
-      : path.join(os.tmpdir(), "My DAW Projects.csv");
+      ? path.join(startPath, config.csvExportFileName)
+      : path.join(os.tmpdir(), config.csvExportFileName);
 
       fs.writeFileSync(csvPath, csv);
 

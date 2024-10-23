@@ -17,7 +17,7 @@ function createWindow() {
     minWidth: 1000,
     minHeight: 600,
     icon: path.join(__dirname, '../public/icons/daw_app_icon_no_bg.ico'),
-    title: "My DAW Projects",
+    title: "DAW Projects Dashboard",
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -75,13 +75,13 @@ function createWindow() {
     {
       label: 'Help',
       submenu: [
-        {
-          label: 'Learn More',
-          click: async () => {
-            console.log("Learn More clicked, sending 'openExternal' event");
-            await shell.openExternal('https://dkos23.github.io/ableton-dashboard/');
-          },
-        },
+        // {
+        //   label: 'Learn More',
+        //   click: async () => {
+        //     console.log("Learn More clicked, sending 'openExternal' event");
+        //     await shell.openExternal('https://dkos23.github.io/ableton-dashboard/');
+        //   },
+        // },
         {
           label: 'About',
           click: () => {

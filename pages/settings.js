@@ -17,7 +17,8 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import styles from "../frontend/styles/Settings.module.css";
-import strings from '../locales/strings'; 
+import strings from '../locales/strings';
+// import config from '../public/app_config.js';
 
 // Create a dark theme using Material-UI
 const darkTheme = createTheme({

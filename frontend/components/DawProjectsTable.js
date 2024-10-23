@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TextField, TableSortLabel, Box, CircularProgress, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TextField, TableSortLabel, Box, CircularProgress, Button, Snackbar } from '@mui/material';
 import TreeViewModal from './TreeViewModal';
 import styles from '../styles/DawProjectsTable.module.css';
 import strings from '../../locales/strings';
@@ -21,11 +21,13 @@ class DawProjectsTable extends Component {
       fileCount: 0,
       fileExtension: '.als',
       showTreeViewModal: false,
+      csvExportSuccess: false,
     };
     // Bind the functions to this class component
     this.openTreeViewModal = this.openTreeViewModal.bind(this);
     this.closeTreeViewModal = this.closeTreeViewModal.bind(this);
     this.exportToCsv = this.exportToCsv.bind(this);
+    this.handleCloseSnackbar = this.handleCloseSnackbar.bind(this);
   }
 
   componentDidMount() {
@@ -87,11 +89,24 @@ class DawProjectsTable extends Component {
 
       // console.log(response.message);
 
+      // Show success message
+      this.setState({ csvExportSuccess: true });
+
+      // Automatically hide success message after 3 seconds
+      setTimeout(() => {
+        this.setState({ csvExportSuccess: false });
+      }, 3000);
+
       console.log('CSV saved at: ', response.path);
     } catch (error) {
       console.error('Error exporting CSV:', error);
     }
   };
+
+  // Close Snackbar
+  handleCloseSnackbar() {
+    this.setState({ csvExportSuccess: false });
+  }
 
   /**
    * Fetch project files
@@ -202,7 +217,7 @@ class DawProjectsTable extends Component {
 
 
   render() {
-    const { projects, searchTerm, sortConfig, loading, fileCount, showTreeViewModal } = this.state;
+    const { projects, searchTerm, sortConfig, loading, fileCount, showTreeViewModal, csvExportSuccess } = this.state;
     const { language } = this.props;
 
     // Dynamically load strings based on the selected language
@@ -343,6 +358,14 @@ class DawProjectsTable extends Component {
           // data={mockProjects}
           data={this.state.projects}
           language={language}
+        />
+
+        {/* Snackbar to show export success message */}
+        <Snackbar
+          open={csvExportSuccess}
+          autoHideDuration={3000}
+          onClose={this.handleCloseSnackbar}
+          message={langStrings.exportCsvSuccess || 'CSV Exported Successfully!'}
         />
 
       </div>

@@ -1,10 +1,12 @@
 module.exports = {
+    csvExportFileName: "DAW Projects Dashboard.csv",
+    csvExportFields: ["projectName", "tempo", "date", "path"],
     maxFileSize: 100 * 1024 * 1024, // 100MB
     supportedFileExtensions: ['.als', '.bwproject', '.song', '.cpr'],
     apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3000',
     appName: 'DAW Projects Dashboard',
     version: '1.0.0',
-    defaultLanguage: 'en',
+    defaultLanguage: 'de',
     directoriesToExclude: [
       "Backup",
       "Samples",
