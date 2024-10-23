@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import styles from '../styles/TreeView.module.css'; // Import the CSS module
+import styles from '../styles/TreeView.module.css';
 
 const TreeView = ({ data }) => {
   const svgRef = useRef(null);
@@ -16,7 +16,6 @@ const TreeView = ({ data }) => {
     // Get container's width and height dynamically
     const container = svgElement.node().parentNode;
     const width = container.clientWidth || 600;
-    // const height = container.clientHeight || 600;
     const height = container.clientHeight || 1000;
 
     // Margin calculation with dynamic right margin
@@ -47,10 +46,10 @@ const TreeView = ({ data }) => {
 
       data.forEach((item) => {
         const parts = item.path.split(/[\\/]/); // Split the path into parts
-        const lastFolderIndex = parts.indexOf(lastFolder); // Find the index of the last folder
+        const lastFolderIndex = parts.indexOf(lastFolder);
 
         if (lastFolderIndex !== -1) {
-          const relevantParts = parts.slice(lastFolderIndex); // Get everything from the last folder onwards
+          const relevantParts = parts.slice(lastFolderIndex);
 
           // Push the transformed object into newdata
           newdata.push({
@@ -61,7 +60,7 @@ const TreeView = ({ data }) => {
       });
 
       newdata.forEach((item) => {
-        const parts = item.path.split(/[\\/]/); // Split by slashes again for tree building
+        const parts = item.path.split(/[\\/]/);
         let current = tree;
 
         // Traverse through the path to build the tree
@@ -121,7 +120,6 @@ const TreeView = ({ data }) => {
       .attr('height',  Math.max(treeHeight, height))
       .attr('viewBox', [0, 0, width, height])
       // .attr('viewBox', [0, 0, width + margin.right, Math.max(treeHeight, height)])
-      // .attr('preserveAspectRatio', 'xMidYMid meet') // Preserve aspect ratio
       .classed(styles['tree-svg'], true); // Apply the tree-svg class
 
 
@@ -148,8 +146,8 @@ const TreeView = ({ data }) => {
       .selectAll('.node')
       .data(root.descendants())
       .join('g')
-      .classed(styles['node'], true) // Apply the node class from CSS
-      .attr('transform', (d) => `translate(${d.y + margin.left},${d.x + margin.top})`); // Adjust nodes to use margins
+      .classed(styles['node'], true)
+      .attr('transform', (d) => `translate(${d.y + margin.left},${d.x + margin.top})`);
 
     node
       .append('circle')
@@ -161,7 +159,7 @@ const TreeView = ({ data }) => {
       .attr('dy', '0.31em')
       .attr('x', (d) => (d.children ? -10 : 10))
       .attr('text-anchor', (d) => (d.children ? 'end' : 'start'))
-      .classed(styles['node-text'], true) // Apply the node-text class
+      .classed(styles['node-text'], true)
       .text((d) => d.data.name);
 
       // Enable zoom and pan behavior
