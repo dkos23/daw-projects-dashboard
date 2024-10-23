@@ -136,6 +136,16 @@ ipcMain.handle('export-to-csv', async (event, startPath, projects) => {
   }
 });
 
+ipcMain.handle('get-icon-path', () => {
+  // In development, we serve it from the public directory
+  if (process.env.NODE_ENV === 'development') {
+    return '/icons/daw_app_icon_no_bg_256.png';
+  } else {
+    // In production, we load it from the built resources
+    return `file://${path.join(process.resourcesPath, 'icons', 'daw_app_icon_no_bg_256.png')}`;
+  }
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {

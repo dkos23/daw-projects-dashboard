@@ -19,18 +19,52 @@ const TreeView = ({ data }) => {
     // const height = container.clientHeight || 600;
     const height = container.clientHeight || 1000;
 
-    const margin = { top: 20, right: 120, bottom: 20, left: 120 };
+    // Margin calculation with dynamic right margin
+    let maxLabelLength = 0;
+    data.forEach(item => {
+      const parts = item.path.split(/[\\/]/);
+      parts.forEach(part => {
+        if (part.length > maxLabelLength) {
+          maxLabelLength = part.length;
+        }
+      });
+    });
+
+    // const margin = { top: 10, right: 10, bottom: 20, left: 20 };
+    const margin = { top: 20, right: maxLabelLength * 7 - 60, bottom: 20, left: 20 };
 
     // Adjust the tree layout dimensions based on available width and height
     const treeLayout = d3
       .tree()
       .size([height - margin.top - margin.bottom, width - margin.left - margin.right]);
 
+    let newdata = [];
     const buildTree = (data) => {
       const tree = {};
+
+      const savedStartPath = localStorage.getItem('startPath');
+      const lastFolder = savedStartPath.split(/[\\/]/).pop();
+
       data.forEach((item) => {
-        const parts = item.path.split(/[\\/]/); // Split by both slashes
+        const parts = item.path.split(/[\\/]/); // Split the path into parts
+        const lastFolderIndex = parts.indexOf(lastFolder); // Find the index of the last folder
+
+        if (lastFolderIndex !== -1) {
+          const relevantParts = parts.slice(lastFolderIndex); // Get everything from the last folder onwards
+
+          // Push the transformed object into newdata
+          newdata.push({
+            ...item,
+            path: relevantParts.join('\\'), // Rebuild the path from the relevant parts
+          });
+        }
+      });
+
+      newdata.forEach((item) => {
+        const parts = item.path.split(/[\\/]/); // Split by slashes again for tree building
         let current = tree;
+
+        // Traverse through the path to build the tree
         parts.forEach((part, index) => {
           if (!current[part]) {
             current[part] = {
@@ -38,14 +72,20 @@ const TreeView = ({ data }) => {
               children: {},
             };
           }
+          
+          // Attach the file data to the last part (file node)
           if (index === parts.length - 1) {
             current[part] = { ...current[part], ...item };
           }
+
           current = current[part].children;
         });
       });
 
       const convertTreeObjectToArray = (obj) => {
+        if (!obj || typeof obj !== 'object') {
+          return [];
+        }
         const keys = Object.keys(obj);
         return keys.map((key) => ({
           ...obj[key],
@@ -54,30 +94,43 @@ const TreeView = ({ data }) => {
       };
 
       return {
-        name: 'Root',
+        name: "...",
         children: convertTreeObjectToArray(tree),
       };
     };
 
     const treeData = buildTree(data);
 
-    // Set up SVG dimensions
-    svgElement
-      .attr('width', width)
-      .attr('height', height)
-      .attr('viewBox', [0, 0, width, height])
-      // .attr('preserveAspectRatio', 'xMidYMid meet') // Preserve aspect ratio
-      .classed(styles['tree-svg'], true); // Apply the tree-svg class
+    // Clear any existing elements before re-rendering
+    svgElement.selectAll('*').remove();
 
     const root = d3.hierarchy(treeData);
     treeLayout(root);
+
+    const nodes = root.descendants();
+    const treeHeight = nodes.length * 30;
+
+    // Create a container group that will handle panning and zooming
+    const g = svgElement
+      .append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    // Set up SVG dimensions
+    svgElement
+      .attr('width', width)
+      .attr('height',  Math.max(treeHeight, height))
+      .attr('viewBox', [0, 0, width, height])
+      // .attr('viewBox', [0, 0, width + margin.right, Math.max(treeHeight, height)])
+      // .attr('preserveAspectRatio', 'xMidYMid meet') // Preserve aspect ratio
+      .classed(styles['tree-svg'], true); // Apply the tree-svg class
+
 
     // Clear any existing nodes and links before re-rendering
     svgElement.selectAll('.link').remove();
     svgElement.selectAll('.node').remove();
 
     // Add links between nodes
-    svgElement
+    g
       .selectAll('.link')
       .data(root.links())
       .join('path')
@@ -91,7 +144,7 @@ const TreeView = ({ data }) => {
       );
 
     // Add nodes
-    const node = svgElement
+    const node = g
       .selectAll('.node')
       .data(root.descendants())
       .join('g')
@@ -110,7 +163,15 @@ const TreeView = ({ data }) => {
       .attr('text-anchor', (d) => (d.children ? 'end' : 'start'))
       .classed(styles['node-text'], true) // Apply the node-text class
       .text((d) => d.data.name);
+
+      // Enable zoom and pan behavior
+      const zoom = d3.zoom().on('zoom', (event) => {
+        g.attr('transform', event.transform); // Apply zoom/pan transformation to the group
+      });
+
+      svgElement.call(zoom);
   }, [data]);
+
 
   return <svg ref={svgRef}></svg>;
 };

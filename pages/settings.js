@@ -167,6 +167,7 @@ const Settings = ({ language }) => {
               <MenuItem value="Bitwig">Bitwig</MenuItem>
               <MenuItem value="StudioOne">Studio One</MenuItem>
               <MenuItem value="Cubase">Cubase</MenuItem>
+              <MenuItem value="AkaiMPC">Akai MPC</MenuItem>
             </Select>
           </FormControl>
 
@@ -178,6 +179,7 @@ const Settings = ({ language }) => {
             margin="normal"
             value={donationAmount}
             onChange={(e) => setDonationAmount(e.target.value)}
+            disabled={true}
             InputProps={{
               inputProps: { min: 5 },
               style: { color: "white" },
@@ -199,7 +201,7 @@ const Settings = ({ language }) => {
         {/* Footer Section */}
         <Box component="footer" className={styles["footer"]}>
           <Typography variant="body2" align="center">
-            My DAW Projects Dashboard v1.0
+            DAW Projects Dashboard v1.0
             <br />
             Developed by @CoreSignal <br/>Credits to: nukearts{" "}
             <br />© 2024

@@ -3,6 +3,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, useMediaQuer
 import TreeView from './TreeView';  // Assuming TreeView is in the same folder
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import styles from '../styles/TreeViewModal.module.css';
+import strings from '../../locales/strings';
 
 const darkTheme = createTheme({
   palette: {
@@ -10,10 +11,10 @@ const darkTheme = createTheme({
   },
 });
 
-const TreeViewModal = ({ open, onClose, data }) => {
+const TreeViewModal = ({ open, onClose, data, language }) => {
   const fullScreen = useMediaQuery('(max-width:600px)');  // Responsive handling for small screens
 
-  console.log("TreeViewModal ....");
+  const langStrings = strings[language] || strings['en'];
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -22,7 +23,6 @@ const TreeViewModal = ({ open, onClose, data }) => {
         onClose={onClose}
         maxWidth="lg"
         fullWidth
-        fullHeight
         fullScreen={fullScreen}  // Adapt modal to small screens
         PaperProps={{
           style: {
@@ -36,14 +36,14 @@ const TreeViewModal = ({ open, onClose, data }) => {
         }}
         className={styles['modal-dialog']}
       >
-        <DialogTitle>Project Folder Structure</DialogTitle>
+        <DialogTitle>{langStrings.treeViewHeader}</DialogTitle>
         <DialogContent className={styles['dialog-content']}>
           {/* TreeView component inside the dialog */}
           <TreeView data={data} />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose} color="primary">
-            Close
+            {langStrings.close}
           </Button>
         </DialogActions>
       </Dialog>

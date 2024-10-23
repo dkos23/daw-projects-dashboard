@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TextField, TableSortLabel, Box, CircularProgress, Button } from '@mui/material';
-import TreeView from './TreeView';
 import TreeViewModal from './TreeViewModal';
 import styles from '../styles/DawProjectsTable.module.css';
 import strings from '../../locales/strings';
@@ -39,6 +38,8 @@ class DawProjectsTable extends Component {
       fileExtension = '.bwproject';
     } else if (selectedDAW === 'Cubase') {
       fileExtension = '.cpr';
+    } else if (selectedDAW === 'AkaiMPC') {
+      fileExtension = '.xpj';
     }
     
     // Fetch project files when component mounts
@@ -198,9 +199,6 @@ class DawProjectsTable extends Component {
     const { projects, searchTerm, sortConfig, loading, fileCount, showTreeViewModal } = this.state;
     const { language } = this.props;
 
-    // Log the projects state right before rendering !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    console.log("Projects being passed to TreeView: ", projects);
-
     // Dynamically load strings based on the selected language
     const langStrings = strings[language] || strings['en'];
     // Apply both filtering and sorting to projects
@@ -242,6 +240,7 @@ class DawProjectsTable extends Component {
             <Button
               className={styles['export-button']}
               onClick={this.openTreeViewModal}
+              disabled={this.state.fileCount === 0}
             >
               {langStrings.showTreeView}
             </Button>
@@ -249,6 +248,7 @@ class DawProjectsTable extends Component {
             <Button
               className={styles['export-button']}
               onClick={this.exportToCsv}
+              disabled={this.state.fileCount === 0}
             >
               {langStrings.exportCsv}
             </Button>
@@ -332,9 +332,11 @@ class DawProjectsTable extends Component {
 
         {/* Tree View Modal */}
         <TreeViewModal
-          open={showTreeViewModal}  // Controlled by state
-          onClose={this.closeTreeViewModal}  // Modal can be closed
-          data={mockProjects}  // Mocked data for tree view
+          open={showTreeViewModal}
+          onClose={this.closeTreeViewModal}
+          // data={mockProjects}
+          data={this.state.projects}
+          language={language}
         />
 
       </div>

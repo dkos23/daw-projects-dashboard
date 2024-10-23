@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, Typography, Button, CssBaseline } from '@mui/material';
 import Image from 'next/image';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -26,15 +26,30 @@ const darkTheme = createTheme({
 });
 
 const AboutDialog = ({ open, onClose, language = 'en' }) => {
+    const [iconPath, setIconPath] = useState('');
     const langStrings = strings[language] || strings['en'];
+    // Fetch the icon path when the component is mounted
+    useEffect(() => {
+      const isDevelopment = process.env.NODE_ENV === 'development';
+  
+      if (isDevelopment) {
+        setIconPath('/icons/daw_app_icon_no_bg_256.png');
+      } else if (window.electronAPI) {
+        window.electronAPI.getIconPath().then((path) => {
+          setIconPath(path);
+        });
+      }
+    }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Dialog open={open} onClose={onClose} PaperProps={{ className: styles.dialogPaper }}>
-        {/* Icon added below the aboutApp section */}
+        {/* Icon added */}
         <div className={styles.iconContainer}>
           <Image
-              src="/icons/daw_app_icon_no_bg_256.png"
+              // src="/icons/daw_app_icon_no_bg_256.png"
+              src={iconPath}
               alt="About Icon"
               width={80}
               height={80}

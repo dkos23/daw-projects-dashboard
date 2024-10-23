@@ -1,18 +1,27 @@
-const fs = require("fs/promises");
-const fsNode = require('fs');
+const fsPromises = require("fs/promises");
+const fs = require('fs');
 const path = require("path");
 const unzipper = require('unzipper');
 const xml2js = require("xml2js");
+const stream = require('stream');
+// const Transform = require('stream');
 const { gunzip } = require("zlib");
 const { promisify } = require("util");
 const { exec } = require("child_process");
 const { parseStringPromise } = require('xml2js');
 const { Parser } = require("json2csv");
 
+const config = require('../public/app_config.js');
+
+// Promisify fs.access
+// const access = promisify(fs.access);
+// Promisify stream for better async/await handling
+const pipelineAsync = promisify(stream);
+
 // Function to get the last modified date of a file
 async function getFileDate(filePath) {
   try {
-    const stats = await fs.stat(filePath);
+    const stats = await fsPromises.stat(filePath);
     return stats.mtime;
   } catch (error) {
     console.error(`Error fetching date for ${filePath}: ${error.message}`);
@@ -21,9 +30,14 @@ async function getFileDate(filePath) {
 }
 
 // Function to extract tempo from Ableton's compressed .als file
-async function extractTempoFromAls(filePath) {
+async function extractTempoFromAbleton(filePath) {
   try {
-    const fileBuffer = await fs.readFile(filePath);
+    const alsFilePath = filePath.replace('.als', '.als');
+    const alsExists = await fsPromises.access(alsFilePath).then(() => true).catch(() => false);
+    if (!alsExists) {
+      return null;
+    }
+    const fileBuffer = await fsPromises.readFile(alsFilePath);
 
     // Detect GZIP compression by looking at the file header
     if (fileBuffer.slice(0, 2).toString("hex") === "1f8b") {
@@ -43,29 +57,92 @@ async function extractTempoFromAls(filePath) {
   }
 }
 
-// TODO ?????????????????????????????????????????????????????????????????
-// Function to extract tempo from Cubase's compressed file
-async function extractTempoFromCubase(filePath) {
-  try {
-    const fileBuffer = await fs.readFile(filePath);
-
-    // Detect GZIP compression by looking at the file header
-    if (fileBuffer.slice(0, 2).toString("hex") === "1f8b") {
-      const uncompressedData = await promisify(gunzip)(fileBuffer);
-      const xmlString = uncompressedData.toString("utf8");
-      const parser = new xml2js.Parser();
-      const result = await parser.parseStringPromise(xmlString);
-      return findManualTempoInStructure(result);
-    } else {
-      throw new Error(
-        "File is not GZIP compressed or not in the expected format."
-      );
-    }
-  } catch (error) {
-    console.error(`Error extracting tempo from ${filePath}: ${error.message}`);
+// Helper to find tempo in XML structure
+function findManualTempoInStructure(xmlStructure) {
+  if (!xmlStructure || typeof xmlStructure !== "object") {
     return null;
   }
+
+  if (xmlStructure.Tempo) {
+    for (const tempoElement of xmlStructure.Tempo) {
+      if (
+        tempoElement.Manual &&
+        tempoElement.Manual[0] &&
+        tempoElement.Manual[0].$.Value
+      ) {
+        return tempoElement.Manual[0].$.Value;
+      }
+    }
+  }
+
+  for (const key in xmlStructure) {
+    if (
+      xmlStructure.hasOwnProperty(key) &&
+      typeof xmlStructure[key] === "object"
+    ) {
+      const foundTempo = findManualTempoInStructure(xmlStructure[key]);
+      if (foundTempo) {
+        return foundTempo;
+      }
+    }
+  }
+  return null;
 }
+
+// Stream-based function to extract tempo from Ableton .als files
+// async function extractTempoFromAbletonStream(filePath) {
+//   try {
+//     const alsFilePath = filePath.replace('.als', '.als');
+//     await fs.promises.access(alsFilePath, fs.constants.F_OK); // Check if file exists
+
+//     const fileStream = fs.createReadStream(alsFilePath);
+//     let parser = new xml2js.Parser();
+//     let xmlString = '';
+//     let isGzip = false;
+
+//     // Read the first few bytes to check if it's GZIP compressed
+//     const header = await new Promise((resolve, reject) => {
+//       const headerBuffer = Buffer.alloc(2);
+//       fileStream.once('readable', () => {
+//         const chunk = fileStream.read(2); // Read the first two bytes (header)
+//         if (chunk) {
+//           chunk.copy(headerBuffer);
+//           resolve(headerBuffer);
+//         } else {
+//           reject(new Error('Could not read header'));
+//         }
+//       });
+//     });
+
+//     if (header.toString('hex') === '1f8b') {
+//       // File is GZIP compressed, use gunzip stream
+//       isGzip = true;
+//       fileStream.unshift(header); // Put the header back so that gunzip works properly
+//     }
+
+//     const transformStream = isGzip ? zlib.createGunzip() : fileStream;
+
+//     // Transform stream to accumulate chunks into XML string
+//     const accumulator = new Transform({
+//       transform(chunk, encoding, callback) {
+//         xmlString += chunk.toString('utf8');
+//         callback(null, chunk);
+//       }
+//     });
+
+//     // Use pipeline to handle the flow of streams
+//     await pipelineAsync(transformStream, accumulator);
+
+//     // Parse the accumulated XML string
+//     const parsedData = await parser.parseStringPromise(xmlString);
+
+//     // Return the found tempo
+//     return findManualTempoInStructure(parsedData);
+//   } catch (error) {
+//     console.error(`Error extracting tempo from ${filePath}: ${error.message}`);
+//     return null;
+//   }
+// }
 
 /**
  * !! Bitwig can be used only if .dawproject exists -> Bitwig "Export Project" !!
@@ -75,16 +152,17 @@ async function extractTempoFromCubase(filePath) {
  */
 async function extractTempoFromBitwig(filePath) {
   const dawproject = "project.xml";
-  let tempo = "[no dawproject file]";
+  // let tempo = "[no dawproject file]";
+  let tempo = null;
   try {
     // Change the extension to .dawproject
     const dawprojectFilePath = filePath.replace('.bwproject', '.dawproject');
     
     // Check if the .dawproject file exists in the same directory
-    const dawprojectExists = await fs.access(dawprojectFilePath).then(() => true).catch(() => false);
+    const dawprojectExists = await fsPromises.access(dawprojectFilePath).then(() => true).catch(() => false);
     
     if (!dawprojectExists) {
-      console.warn('.dawproject file not found in the Bitwig project folder.');
+      // console.warn('.dawproject file not found in the Bitwig project folder.');
       return tempo;
     }
     // Unzip the .bwproject file
@@ -123,7 +201,7 @@ async function extractTempoFromBitwig(filePath) {
 async function extractTempoFromStudioOne(filePath) {
   try {
     // Read the .song file as a zip
-    const zip = await fs.readFile(filePath);
+    const zip = await fsPromises.readFile(filePath);
     const zipEntries = await unzipper.Open.buffer(zip);
 
     // Look for "metainfo.xml" in the .song file (Studio One project)
@@ -149,87 +227,113 @@ async function extractTempoFromStudioOne(filePath) {
   }
 }
 
+/**
+ * Function to extract tempo from Akai MPC's .xpj
+ * @param {string} xmlFilePath - Path to the xpj file.
+ * @returns {Promise<string>} - The extracted tempo value or null if not found.
+ */
+async function extractTempoFromAkaiMPC(filePath) {
+  try {
+    // Read the file content
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    
+    // Parse the XML content
+    const parser = new xml2js.Parser();
+    const parsedXml = await parser.parseStringPromise(fileContent);
+    
+    // Navigate through the parsed XML structure to find the tempo
+    const project = parsedXml?.Project;
+    const bpm = project?.BPM?.[0]; // Extract <BPM> value
+    const masterTempo = project?.['MasterTempo.Value']?.[0]; // Extract <MasterTempo.Value> if needed
+
+    // Choose which value to return, prioritize <BPM> over <MasterTempo.Value>
+    const tempo = bpm;
+
+    if (tempo) {
+      return parseFloat(tempo);
+    } else {
+      throw new Error('Tempo not found in the .xpj file.');
+    }
+  } catch (error) {
+    console.error('Error extracting tempo from .xpj file:', error);
+    return null;
+  }
+}
+
+// TODO ?????????????????????????????????????????????????????????????????
+// Function to extract tempo from Cubase's compressed file
+async function extractTempoFromCubase(filePath) {
+  try {
+    const xmlString = filePath.toString("utf8");
+
+    console.log(xmlString);
+    const parser = new xml2js.Parser();
+    const result = await parser.parseStringPromise(xmlString);
+    return findManualTempoInStructure(result);
+  } catch (error) {
+    console.error(`Error extracting tempo from ${filePath}: ${error.message}`);
+    return null;
+  }
+}
+
 // Function to search for eg:Ableton .als files
 async function searchFiles(dir, ext) {
   let results = [];
-  const list = await fs.readdir(dir, { withFileTypes: true });
-  let fileFound = false;
-  let date = "";
 
-  for (const file of list) {
-    const filePath = path.join(dir, file.name);
-
-    // exclude folders from different DAWs folder structure
-    if (
-      file.isDirectory() && (
-        file.name === "Backup" ||
-        file.name === "Samples" ||
-        file.name === "auto-backups"
-      )
-    ) {
-      continue;
-    }
-
-    let tempo;
-    if (file.isDirectory()) {
-      if (!fileFound) {
-        results = results.concat(await searchFiles(filePath, ext));
-      }
-    } else if (file.name.endsWith(ext)) {
-      // Call appropriate metadata(tempo extraction) function based on the DAW
-      if (ext === '.als') {
-        tempo = await extractTempoFromAls(filePath);
-      } else if (ext === '.song') {
-        tempo = await extractTempoFromStudioOne(filePath);
-      } else if (ext === '.bwproject') {
-        tempo = await extractTempoFromBitwig(filePath);
-      } else if (ext === '.cpr') {
-        tempo = await extractTempoFromCubase(filePath);
-      }
-
-      date = await getFileDate(filePath);
-      results.push({ path: filePath, tempo, date });
-      fileFound = true;
-    }
-  }
-  // log for debugging :
-  // results.forEach(result => {
-  //   console.log("results: " + JSON.stringify(result,null,2));
-  // });
-  return results;
-}
-
-// Helper to find tempo in XML structure
-function findManualTempoInStructure(xmlStructure) {
-  if (!xmlStructure || typeof xmlStructure !== "object") {
-    return null;
-  }
-
-  if (xmlStructure.Tempo) {
-    for (const tempoElement of xmlStructure.Tempo) {
+  try {
+    const list = await fsPromises.readdir(dir, { withFileTypes: true });
+    let fileFound = false;
+    let date = "";
+  
+    for (const file of list) {
+      const filePath = path.join(dir, file.name);
+  
+      // Use the config to check if a directory should be excluded
       if (
-        tempoElement.Manual &&
-        tempoElement.Manual[0] &&
-        tempoElement.Manual[0].$.Value
+        file.isDirectory() && (
+          config.directoriesToExclude.includes(file.name) ||
+          config.winDirectoriesToExclude.includes(file.name)
+        )
       ) {
-        return tempoElement.Manual[0].$.Value;
+        continue;
+      }
+  
+      let tempo;
+      if (file.isDirectory()) {
+        if (!fileFound) {
+          results = results.concat(await searchFiles(filePath, ext));
+        }
+      } else if (file.name.endsWith(ext)) {
+        if (ext === '.als') {
+          tempo = await extractTempoFromAbleton(filePath);
+        } else if (ext === '.song') {
+          tempo = await extractTempoFromStudioOne(filePath);
+        } else if (ext === '.bwproject') {
+          tempo = await extractTempoFromBitwig(filePath);
+        } else if (ext === '.cpr') {
+          tempo = await extractTempoFromCubase(filePath);
+        } else if (ext === '.xpj') {
+          tempo = await extractTempoFromAkaiMPC(filePath);
+        }
+  
+        date = await getFileDate(filePath);
+        results.push({ path: filePath, tempo, date });
+        fileFound = true;
       }
     }
-  }
-
-  for (const key in xmlStructure) {
-    if (
-      xmlStructure.hasOwnProperty(key) &&
-      typeof xmlStructure[key] === "object"
-    ) {
-      const foundTempo = findManualTempoInStructure(xmlStructure[key]);
-      if (foundTempo) {
-        return foundTempo;
-      }
+    // log for debugging :
+    // results.forEach(result => {
+    //   console.log("results: " + JSON.stringify(result,null,2));
+    // });
+    
+  } catch (error) {
+    if (error.code === 'EPERM' || error.code === 'EACCES') {
+      return; // Skip directories without sufficient permissions
+    } else {
+      console.error(`Error searching files in directory`, error);
     }
   }
-
-  return null;
+  return results;
 }
 
 function openExplorer(filePath) {
@@ -260,7 +364,7 @@ async function exportToCsv(startPath, files) {
       ? path.join(startPath, "My DAW Projects.csv")
       : path.join(os.tmpdir(), "My DAW Projects.csv");
 
-      fsNode.writeFileSync(csvPath, csv);
+      fs.writeFileSync(csvPath, csv);
 
     console.log(`CSV saved at: ${csvPath}`);
 
@@ -274,7 +378,7 @@ async function exportToCsv(startPath, files) {
 // Export functions for use in Electron's main process
 module.exports = {
   getFileDate,
-  extractTempoFromAls,
+  extractTempoFromAbleton,
   extractTempoFromStudioOne,
   searchFiles,
   openExplorer,
