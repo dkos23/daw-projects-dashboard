@@ -169,8 +169,14 @@ class DawProjectsTable extends Component {
       let aValue = a[sortConfig.key];
       let bValue = b[sortConfig.key];
 
-      if (Array.isArray(aValue)) aValue = aValue[0] || '';
-      if (Array.isArray(bValue)) bValue = bValue[0] || '';
+      // if (Array.isArray(aValue)) aValue = aValue[0] || '';
+      // if (Array.isArray(bValue)) bValue = bValue[0] || '';
+
+      // Ensure that 'tempo' is sorted numerically, not alphabetically
+      if (sortConfig.key === 'tempo') {
+        aValue = parseFloat(aValue) || 0;
+        bValue = parseFloat(bValue) || 0;
+      }
 
       if (typeof aValue === 'string') {
         aValue = aValue.toLowerCase();
