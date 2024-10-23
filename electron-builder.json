@@ -12,8 +12,15 @@
   ],
   "directories": {
     "output": "dist",
-    "buildResources": "public/icons"
+    "buildResources": "build"
   },
+  "extraResources": [
+    {
+      "from": "public/icons",
+      "to": "icons",
+      "filter": ["**/*"]
+    }
+  ],
   "publish": [
     {
       "provider": "github"
