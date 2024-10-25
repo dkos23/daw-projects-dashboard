@@ -1,22 +1,33 @@
 
-# My DAW Projects
+# DAW Projects Dashboard
 
 This project contains both a frontend dashboard to visualize DAW project data and a backend for searching project files on the local filesystem. And more features.
 
 This dashboard displays all your DAW project files along with their tempo, modified date, samples used.
 
+CSV export feature, and TreeView of found directory structure.
+
 ## Structure
 
 - **electron/**: Contains the electron server for searching files.
+- **pages/**: Contains the application pages.
 - **frontend/**: Contains the Next.js application for the app.
-- **frontend/**: Contains the React.js application for the components.
+- **frontend/**: Contains the React.js components.
+- **public/**: Contains the public resources.
+- **locales/**: Contains the language dependent strings.
 
-## Instructions
+## SCM
 
 github repository is private
 
-### Developer and Copyright
+my-daw-projects - [github repo](https://github.com/dkos23/my-daw-projects)
 
-CoreSignal
+includes github workflow - build.yml
 
-(C) All rights reseved
+## Developer and Copyright
+
+CoreSignal (C) All rights reseved
+
+2024
+
+License: GNU GENERAL PUBLIC LICENSE
