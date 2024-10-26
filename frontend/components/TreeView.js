@@ -30,7 +30,7 @@ const TreeView = ({ data }) => {
     });
 
     // const margin = { top: 10, right: 10, bottom: 20, left: 20 };
-    const margin = { top: 20, right: maxLabelLength * 7 - 60, bottom: 20, left: 20 };
+    const margin = { top: 10, right: maxLabelLength * 7, bottom: 30, left: 20 };
 
     // Adjust the tree layout dimensions based on available width and height
     const treeLayout = d3

@@ -30,8 +30,8 @@ const TreeViewModal = ({ open, onClose, data, language }) => {
             backgroundColor: '#000000',  // Dark background
             // color: '#ffffff',
             color: '#9e9e9e',
-            maxHeight: '80vh',  // Increase the maximum height of the modal to 90% of the viewport height
-            height: '80vh', 
+            maxHeight: '90vh',  // Increase the maximum height of the modal to 90% of the viewport height
+            height: '90vh', 
           },
         }}
         className={styles['modal-dialog']}

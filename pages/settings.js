@@ -204,7 +204,7 @@ const Settings = ({ language }) => {
           <Typography variant="body2" align="center">
             DAW Projects Dashboard v1.0
             <br />
-            Developed by @CoreSignal <br/>Credits to: nukearts{" "}
+            Developed by @CoreSignal
             <br />© 2024
           </Typography>
         </Box>
