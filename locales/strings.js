@@ -41,7 +41,7 @@ const strings = {
       close: 'Close',
     },
     de: {
-      appName: 'DAW Projekte Dashbaord',
+      appName: 'DAW Projekte Dashboard',
       home: 'Home',
       settings: 'Einstellungen',
       welcomeMessage: 'Willkommen im Mein DAW Projekte Dashboard',

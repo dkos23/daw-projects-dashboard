@@ -12,7 +12,7 @@ const darkTheme = createTheme({
 });
 
 const TreeViewModal = ({ open, onClose, data, language }) => {
-  const fullScreen = useMediaQuery('(max-width:600px)');  // Responsive handling for small screens
+  const fullScreen = useMediaQuery('(max-width:800px)');  // Responsive handling for small screens
 
   const langStrings = strings[language] || strings['en'];
 
@@ -21,7 +21,7 @@ const TreeViewModal = ({ open, onClose, data, language }) => {
       <Dialog
         open={open}
         onClose={onClose}
-        maxWidth="lg"
+        maxWidth="xl"
         fullWidth
         fullScreen={fullScreen}  // Adapt modal to small screens
         PaperProps={{
@@ -30,7 +30,7 @@ const TreeViewModal = ({ open, onClose, data, language }) => {
             backgroundColor: '#000000',  // Dark background
             // color: '#ffffff',
             color: '#9e9e9e',
-            maxHeight: '90vh',  // Increase the maximum height of the modal to 90% of the viewport height
+            maxHeight: '100vh',  // Increase the maximum height of the modal to 90% of the viewport height
             height: '90vh', 
           },
         }}
