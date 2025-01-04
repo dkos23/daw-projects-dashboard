@@ -40,5 +40,40 @@ module.exports = {
         "Windows\\WinSxS", 
         "Windows\\Logs"
       ],
+
+    // MIDI RootNote to Note mapping
+    MIDI_NOTE_MAPPING: {
+      0: "C",
+      1: "C#",
+      2: "D",
+      3: "D#",
+      4: "E",
+      5: "F",
+      6: "F#",
+      7: "G",
+      8: "G#",
+      9: "A",
+      10: "A#",
+      11: "B"
+    },
+    SCALE_MAPPING: {
+      "0": "Major",
+      "1": "Minor",
+      "2": "Dorian",
+      "3": "Phrygian",
+      "4": "Lydian",
+      "5": "Mixolydian",
+      "6": "Locrian",
+      "7": "Harmonic Minor",
+      "8": "Melodic Minor",
+      "9": "Whole Tone",
+      "10": "Pentatonic Major",
+      "11": "Pentatonic Minor",
+      "12": "Blues",
+      "13": "Gypsy",
+      "14": "Arabic",
+      "15": "Japanese",
+      // Extend with other scales as needed
+    },
   };
   

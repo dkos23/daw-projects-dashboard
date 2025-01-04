@@ -4,8 +4,8 @@ import TreeViewModal from './TreeViewModal';
 import styles from '../styles/DawProjectsTable.module.css';
 import strings from '../../locales/strings';
 
-// DEV use mocked data !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-import mockProjects from '../../public/data/MockProjects';
+// DEV use mocked data !!!!
+// import mockProjects from '../../public/data/MockProjects';
 
 class DawProjectsTable extends Component {
   constructor(props) {
@@ -43,10 +43,6 @@ class DawProjectsTable extends Component {
     } else if (selectedDAW === 'AkaiMPC') {
       fileExtension = '.xpj';
     }
-    
-    // Fetch project files when component mounts
-    // this.setState({ fileExtension });
-    // this.fetchProjectFiles();
 
     // Ensure setState is done before calling fetchProjectFiles
     this.setState({ fileExtension }, () => {
@@ -86,9 +82,6 @@ class DawProjectsTable extends Component {
 
       // Call the Electron backend to export CSV
       const response = await window.electronAPI.exportToCsv(startPath, this.state.projects);
-
-      // console.log(response.message);
-
       // Show success message
       this.setState({ csvExportSuccess: true });
 
@@ -140,11 +133,51 @@ class DawProjectsTable extends Component {
           day: '2-digit',
         }).format(fileDate);
 
+        console.log('formattedDate:', formattedDate);
+
+        // Concatenate root note and scale name for display in one column
+        const scaleInfo = file.scaleInfo
+          ? `${file.scaleInfo.rootNote || 'N/A'} ${file.scaleInfo.name || 'N/A'}`
+          : 'N/A';
+
+        let trackCounts = "N/A";
+        
+        switch (fileExtension) {
+          case ".als":
+          case ".bwproject":
+            trackCounts = file.trackCounts
+              ? `MIDI: ${file.trackCounts.midiTracks}\nAudio: ${file.trackCounts.audioTracks}\nReturn: ${file.trackCounts.returnTracks || "N/A"}`
+              : 'N/A';
+            break;
+          case ".xpj":
+            console.log("case xpj");
+            trackCounts = `Returns: ${file.trackCounts || "N/A"}`;
+            break;
+          case ".song":
+            trackCounts = `Returns: ${file.trackCounts || "N/A"}`;
+            break;
+          
+          case ".cpr":
+            trackCounts = `Returns: ${file.trackCounts || "N/A"}`;
+            break;
+          default:
+            break;
+        }
+        // trackCounts = file.trackCounts
+        //   ? `MIDI: ${file.trackCounts.midiTracks}\nAudio: ${file.trackCounts.audioTracks}\nReturn: ${file.trackCounts.returnTracks}`
+        //   : 'N/A';
+
+        console.log("fetchProjectFiles" + JSON.stringify(file,null,2));
+        
+
         return {
           projectName: projectName || 'N/A',
           tempo: file.tempo || 'N/A',
+          author: file.author || 'N/A',
+          scaleInfo: scaleInfo,
           date: formattedDate || 'N/A',
           path: file.path,
+          trackCounts: trackCounts,
         };
       });
 
@@ -318,7 +351,21 @@ class DawProjectsTable extends Component {
                       </TableSortLabel>
                     </TableCell>
 
-                    <TableCell className={styles['table-header-cell']}>Path to Project</TableCell>
+                    <TableCell className={styles['table-header-cell']}>
+                      <TableSortLabel
+                        active={sortConfig.key === 'scaleInfo'}
+                        direction={sortConfig.direction === 'asc' ? 'asc' : 'desc'}
+                        onClick={() => this.handleSort('scaleInfo')}
+                      >
+                        {langStrings.rootNoteScale}
+                      </TableSortLabel>
+                    </TableCell>
+
+                    <TableCell className={styles['table-header-cell']}>{langStrings.pathToProject}</TableCell>
+
+                    <TableCell className={styles['table-header-cell']}>{langStrings.tracks}</TableCell>
+
+
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -334,6 +381,7 @@ class DawProjectsTable extends Component {
                         <TableCell className={styles['table-cell']}>{project.projectName}</TableCell>
                         <TableCell className={styles['table-cell']}>{project.date}</TableCell>
                         <TableCell className={styles['table-cell']}>{project.tempo}</TableCell>
+                        <TableCell className={styles['table-cell']}>{project.scaleInfo}</TableCell>
                         <TableCell className={styles['table-cell']}>
                           <button
                             className={styles['project-link']}
@@ -341,6 +389,11 @@ class DawProjectsTable extends Component {
                           >
                             {project.path}
                           </button>
+                        </TableCell>
+                        <TableCell className={styles['table-cell']}>
+                          <div style={{ whiteSpace: 'pre-line' }}>
+                            {project.trackCounts}
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
