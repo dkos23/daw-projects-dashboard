@@ -4,14 +4,19 @@ import '../frontend/styles/DawDashboard.module.css';
 import '../frontend/styles/DawProjectsTable.module.css';
 import '../frontend/styles/Settings.module.css';
 import AboutDialog from '../frontend/components/AboutDialog';
+import strings from '../locales/strings';
 import config from '../public/app_config.js';
 
 function MyApp({ Component, pageProps }) {
   const [openAboutDialog, setOpenAboutDialog] = useState(false);
   const [language, setLanguage] = useState(config.defaultLanguage);
+  const langStrings = strings[language] || strings['en'];
 
   // Listen for the 'open-about-dialog' event from the Electron main process
   useEffect(() => {
+    const savedLanguage = localStorage.getItem("language") || config.defaultLanguage;
+    setLanguage(savedLanguage);
+
     if (window.electronAPI) {
       // Listen for the 'set-locale' event from Electron to get system language
       window.electronAPI.onSetLocale((locale) => {
@@ -27,8 +32,9 @@ function MyApp({ Component, pageProps }) {
     }
   }, []);
 
-  // Log the language whenever it changes
+  // Update the document title based on the selected language
   useEffect(() => {
+    document.title = langStrings.settings;
     console.log("Current language: ", language);
   }, [language]);
 

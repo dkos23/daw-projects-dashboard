@@ -39,6 +39,7 @@ const Settings = ({ language }) => {
   const [startPathError, setStartPathError] = useState('');
   const [donationAmount, setDonationAmount] = useState("");
   const [daw, setDaw] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState(language || "en");
   const router = useRouter();
   const langStrings = strings[language] || strings['en'];
 
@@ -46,6 +47,7 @@ const Settings = ({ language }) => {
   useEffect(() => {
     const savedStartPath = localStorage.getItem('startPath');
     const savedDaw = localStorage.getItem('selectedDAW');
+    const savedLanguage = localStorage.getItem("language");
 
     if (savedStartPath) {
       setStartPath(savedStartPath); // Load saved START_PATH if exists
@@ -53,6 +55,10 @@ const Settings = ({ language }) => {
 
     if (savedDaw) {
       setDaw(savedDaw);
+    }
+
+    if (savedLanguage) {
+      setSelectedLanguage(savedLanguage);
     }
 
     // Set document title based on the current language
@@ -79,6 +85,13 @@ const Settings = ({ language }) => {
       return "For negative amount YOU do not get payed :)";
     }
     return '';
+  };
+
+  const handleLanguageChange = (event) => {
+    const newLanguage = event.target.value;
+    setSelectedLanguage(newLanguage);
+    localStorage.setItem("language", newLanguage); // Save selected language to localStorage
+    window.location.reload(); // Reload the app to apply changes
   };
 
   const handleSave = () => {
@@ -172,7 +185,23 @@ const Settings = ({ language }) => {
             </Select>
           </FormControl>
 
-          <TextField
+          {/* Language Dropdown Selection */}
+          <FormControl fullWidth margin="normal" className={styles["settings-input"]}>
+            <InputLabel>{langStrings.selectLanguage}</InputLabel>
+            <Select
+              value={selectedLanguage}
+              label={langStrings.selectLanguage}
+              onChange={handleLanguageChange}
+              style={{ color: 'white' }}  // White text for dark mode
+            >
+              <MenuItem value="en">{langStrings.english}</MenuItem>
+              <MenuItem value="es">{langStrings.spanish}</MenuItem>
+              {/* <MenuItem value="fr">Français</MenuItem> */}
+              <MenuItem value="de">{langStrings.german}</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* <TextField
             label={langStrings.enterDonationAmount}
             variant="outlined"
             type="number"
@@ -186,7 +215,7 @@ const Settings = ({ language }) => {
               style: { color: "white" },
             }}
             className={styles["settings-input"]}
-          />
+          /> */}
 
           {/* Save button */}
           <Button
@@ -205,7 +234,7 @@ const Settings = ({ language }) => {
             DAW Projects Dashboard v1.0
             <br />
             Developed by @CoreSignal
-            <br />© 2024
+            <br />© 2025
           </Typography>
         </Box>
       </Container>
