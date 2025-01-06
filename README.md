@@ -9,11 +9,11 @@ CSV export feature, and TreeView of found directory structure.
 
 ## Installation
 
-build created dist setup .exe and a portable .exe
+electron build will generate distributions: setup .exe and a portable .exe
 
 ## Structure
 
-- **electron/**: Contains the electron server for searching files.
+- **electron/**: Contains the electron backend server logic.
 - **pages/**: Contains the application pages.
 - **frontend/**: Contains the Next.js application for the app.
 - **frontend/**: Contains the React.js components.
@@ -23,8 +23,6 @@ build created dist setup .exe and a portable .exe
 ## SCM
 
 github repository is private
-
-my-daw-projects - [github repo](https://github.com/dkos23/my-daw-projects)
 
 includes github workflow - build.yml
 
