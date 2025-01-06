@@ -145,20 +145,17 @@ class DawProjectsTable extends Component {
         switch (fileExtension) {
           case ".als":
           case ".bwproject":
+          case ".song":
             trackCounts = file.trackCounts
-              ? `MIDI: ${file.trackCounts.midiTracks}\nAudio: ${file.trackCounts.audioTracks}\nReturn: ${file.trackCounts.returnTracks || "N/A"}`
+              ? `MIDI: ${file.trackCounts.midiTracks}\nAudio: ${file.trackCounts.audioTracks}\nReturn: ${file.trackCounts.returnTracks}`
               : 'N/A';
             break;
           case ".xpj":
             console.log("case xpj");
-            trackCounts = `Returns: ${file.trackCounts || "N/A"}`;
+            trackCounts = `${file.trackCounts || "N/A"}`;
             break;
-          case ".song":
-            trackCounts = `Returns: ${file.trackCounts || "N/A"}`;
-            break;
-          
           case ".cpr":
-            trackCounts = `Returns: ${file.trackCounts || "N/A"}`;
+            trackCounts = `${file.trackCounts || "N/A"}`;
             break;
           default:
             break;

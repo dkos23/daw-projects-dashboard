@@ -67,6 +67,7 @@
 .table-header-cell {
   color: white;
   font-weight: bold;
+  background-color: rgb(48, 48, 48);
 }
 
 .table-cell {

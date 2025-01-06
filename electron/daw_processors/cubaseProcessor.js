@@ -12,6 +12,11 @@ async function extractCubaseMetadata(filePath) {
     rootNote: null,
     name: null,
   };
+  let trackCounts = {
+    midiTracks: 0,
+    audioTracks: 0,
+    returnTracks: 0
+  };
 
   try {
     // parseRIFF(filePath);
@@ -48,6 +53,9 @@ async function extractCubaseMetadata(filePath) {
     return {
       tempo,
       scaleInfo,
+      trackCounts,
+      projectName: null,
+      author: null,
     };
   } catch (error) {
     console.error(

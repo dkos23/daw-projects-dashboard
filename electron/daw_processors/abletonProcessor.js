@@ -62,6 +62,11 @@ async function extractAbletonMetadata(filePath) {
   }
 }
 
+/**
+ * 
+ * @param {*} xmlStructure 
+ * @returns 
+ */
 function findMetadataInStructure(xmlStructure) {
   let tempo = null;
   let scaleInfo = {
@@ -198,7 +203,7 @@ function findValue(xmlStructure, key) {
 /**
  * 
  * @param {*} xmlStructure 
- * @returns 
+ * @returns {Object using shorthand property names}
  */
 function findTrackCountsInStructure(xmlStructure) {
   if (!xmlStructure || typeof xmlStructure !== "object") {

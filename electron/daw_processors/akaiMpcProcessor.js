@@ -4,6 +4,11 @@ const config = require('../../public/app_config.js');
 
 // Function to extract metadata from Akai MPC .xpj files
 async function extractAkaiMpcMetadata(filePath) {
+  if (!filePath) {
+    console.error("File path is null or undefined.");
+    return null;
+  }
+
   try {
     const fileContent = fs.readFileSync(filePath, "utf8");
 
@@ -27,7 +32,7 @@ async function extractAkaiMpcMetadata(filePath) {
       trackCounts = mixerReturns.length;
     }
 
-    // fs.writeFileSync("xmlStructureLog.json", JSON.stringify(project.Mixer, null, 2));
+    fs.writeFileSync("xmlStructureLog.json", JSON.stringify(project.Mixer, null, 2));
     // console.log("xmlStructure written to xmlStructureLog.json");
     // console.log("trackCounts: " + trackCounts);
 

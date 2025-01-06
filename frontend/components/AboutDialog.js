@@ -76,7 +76,7 @@ const AboutDialog = ({ open, onClose, language = 'en' }) => {
           </div>
           <Typography variant="body2" className={styles.typography} gutterBottom>
             Developed by @CoreSignal <br />
-            Copyright © 2024
+            Copyright © 2025
           </Typography>
         </DialogContent>
         <div className={styles.buttonContainer}>
