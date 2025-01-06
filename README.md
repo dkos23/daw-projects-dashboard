@@ -3,9 +3,13 @@
 
 This project contains both a frontend dashboard to visualize DAW project data and a backend for searching project files on the local filesystem. And more features.
 
-This dashboard displays all your DAW project files along with their tempo, modified date, samples used.
+This dashboard displays all your DAW project files along with their tempo, modified date, rootNote-Scale, path and tracks used.
 
 CSV export feature, and TreeView of found directory structure.
+
+## Installation
+
+build created dist setup .exe and a portable .exe
 
 ## Structure
 
@@ -30,4 +34,4 @@ CoreSignal (C) All rights reseved
 
 2025
 
-License: Copyright License for Next.js Application
+This project is licensed under the Copyright License for Next.js Application license. See the LICENSE file for details.
