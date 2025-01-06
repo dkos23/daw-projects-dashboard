@@ -30,4 +30,4 @@ CoreSignal (C) All rights reseved
 
 2025
 
-License: MIT Licence
+License: Copyright License for Next.js Application

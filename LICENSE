@@ -1,21 +1,33 @@
-MIT License
+Copyright License for Next.js Application
 
-Copyright (c) 2025 CoreSignal (Dali Kos)
+Copyright © 2025 CoreSignal (Dali Cos)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+All rights reserved.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Permission is hereby granted to [Licensee Name] (the "Licensee") to use, modify, and deploy the Next.js application (the "Software") solely for internal purposes as per the terms defined in this agreement. This license does not permit the distribution, resale, sublicensing, or public sharing of the Software or its derivatives.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Terms and Conditions:
+Grant of License:
+
+The Licensee is granted a non-exclusive, non-transferable, and revocable license to use the Software solely for [purpose of use, e.g., internal business purposes].
+Modifications made to the Software are also subject to the restrictions of this license.
+Restrictions:
+
+The Licensee shall not:
+Distribute or make the Software available to any third parties without prior written consent from CoreSignal.
+Sell, rent, lease, or sublicense the Software.
+Use the Software for any unlawful or unauthorized purposes.
+Ownership:
+
+The Software, including any modifications, enhancements, and derivatives, remains the sole property of CoreSignal.
+All copyrights, trademarks, and intellectual property rights associated with the Software are reserved by CoreSignal.
+Limitation of Liability:
+
+CoreSignal shall not be held liable for any damages, losses, or claims arising out of the use or inability to use the Software.
+Termination:
+
+This license shall terminate immediately upon the breach of any of the terms outlined in this agreement.
+Upon termination, the Licensee must destroy all copies of the Software in their possession.
+Governing Law:
+
+This license shall be governed by and construed in accordance with the laws of Vienna-Austria.
