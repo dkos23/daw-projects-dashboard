@@ -28,6 +28,6 @@ includes github workflow - build.yml
 
 CoreSignal (C) All rights reseved
 
-2024
+2025
 
-License: GNU GENERAL PUBLIC LICENSE
+License: MIT Licence
