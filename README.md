@@ -22,7 +22,7 @@ electron build will generate distributions: setup .exe and a portable .exe
 
 ## SCM
 
-github repository is private
+github repository is open for discussion
 
 includes github workflow - build.yml
 
