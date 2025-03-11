@@ -113,6 +113,9 @@ class DawProjectsTable extends Component {
         return;
       }
 
+      // const notAvailableEmoji = '❌';
+      const notAvailableEmoji = '✖';
+
       // Fetch the file extension from state
       const { fileExtension } = this.state;
       const { language } = this.props;
@@ -137,10 +140,10 @@ class DawProjectsTable extends Component {
 
         // Concatenate root note and scale name for display in one column
         const scaleInfo = file.scaleInfo
-          ? `${file.scaleInfo.rootNote || 'N/A'} ${file.scaleInfo.name || 'N/A'}`
-          : 'N/A';
+          ? `${file.scaleInfo.rootNote || notAvailableEmoji} ${file.scaleInfo.name || notAvailableEmoji}`
+          : notAvailableEmoji;
 
-        let trackCounts = "N/A";
+        let trackCounts = notAvailableEmoji;
         
         switch (fileExtension) {
           case ".als":
@@ -148,31 +151,33 @@ class DawProjectsTable extends Component {
           case ".song":
             trackCounts = file.trackCounts
               ? `MIDI: ${file.trackCounts.midiTracks}\nAudio: ${file.trackCounts.audioTracks}\nReturn: ${file.trackCounts.returnTracks}`
-              : 'N/A';
+              : notAvailableEmoji;
             break;
           case ".xpj":
             console.log("case xpj");
-            trackCounts = `${file.trackCounts || "N/A"}`;
+            trackCounts = `${file.trackCounts || notAvailableEmoji}`;
             break;
           case ".cpr":
-            trackCounts = `${file.trackCounts || "N/A"}`;
+            trackCounts = file.trackCounts
+              ? `MIDI: ${file.trackCounts.midiTracks}\nAudio: ${file.trackCounts.audioTracks}\nReturn: ${file.trackCounts.returnTracks}`
+              : notAvailableEmoji;
             break;
           default:
             break;
         }
         // trackCounts = file.trackCounts
         //   ? `MIDI: ${file.trackCounts.midiTracks}\nAudio: ${file.trackCounts.audioTracks}\nReturn: ${file.trackCounts.returnTracks}`
-        //   : 'N/A';
+        //   : notAvailableEmoji;
 
         console.log("fetchProjectFiles" + JSON.stringify(file,null,2));
         
 
         return {
-          projectName: projectName || 'N/A',
-          tempo: file.tempo || 'N/A',
-          author: file.author || 'N/A',
+          projectName: projectName || notAvailableEmoji,
+          tempo: file.tempo || notAvailableEmoji,
+          author: file.author || notAvailableEmoji,
           scaleInfo: scaleInfo,
-          date: formattedDate || 'N/A',
+          date: formattedDate || notAvailableEmoji,
           path: file.path,
           trackCounts: trackCounts,
         };
@@ -387,10 +392,10 @@ class DawProjectsTable extends Component {
                             {project.path}
                           </button>
                         </TableCell>
-                        <TableCell className={styles['table-cell']}>
-                          <div style={{ whiteSpace: 'pre-line' }}>
-                            {project.trackCounts}
-                          </div>
+                        <TableCell className={styles['table-cell-custom']}
+                          style={{ width: '100px', maxWidth: '150px' }}
+                          >
+                          {project.trackCounts}
                         </TableCell>
                       </TableRow>
                     ))

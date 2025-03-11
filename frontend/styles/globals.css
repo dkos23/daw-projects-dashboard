@@ -22,3 +22,7 @@ html, body {
     overflow: hidden;   /* Ensures the image doesn't spill out of the circle */
   }
   
+  .black-x {
+    color: white;
+    font-weight: bold;
+  }
