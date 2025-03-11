@@ -10,7 +10,7 @@ const config = require("../../public/app_config.js");
 // TODO: Grundton aus xml  "ScaleInformation" "RootNote"
 async function extractAbletonMetadata(filePath) {
   if (!filePath) {
-    console.error("File path is null or undefined.");
+    console.error("extractAbletonMetadata: File path is null or undefined.");
     return null;
   }
 
@@ -20,7 +20,7 @@ async function extractAbletonMetadata(filePath) {
       .then(() => true)
       .catch(() => false);
     if (!alsExists) {
-      console.error(`File does not exist at path: ${filePath}`);
+      console.error(`extractAbletonMetadata: File does not exist at path: ${filePath}`);
       return null;
     }
 
@@ -51,12 +51,12 @@ async function extractAbletonMetadata(filePath) {
       };
     } else {
       throw new Error(
-        "File is not GZIP compressed or not in the expected format."
+        "extractAbletonMetadata: File is not GZIP compressed or not in the expected format."
       );
     }
   } catch (error) {
     console.error(
-      `Error extracting metadata from ${filePath}: ${error.message}`
+      `extractAbletonMetadata: Error extracting metadata from ${filePath}: ${error.message}`
     );
     return null;
   }
@@ -104,7 +104,7 @@ function findMetadataInStructure(xmlStructure) {
       return null;
     }
   } catch (error) {
-    console.error("Error extracting tempo:", error);
+    console.error("findMetadataInStructure: Error extracting tempo:", error);
   }
 
   // Check for ScaleInformation directly within LiveSet
@@ -141,7 +141,7 @@ function findMetadataInStructure(xmlStructure) {
     //   return { rootNote: null, name: null };
     // }
   } catch (error) {
-    console.error("Error extracting scale information:", error);
+    console.error("findMetadataInStructure: Error extracting scale information:", error);
   }
 
   // Recursive search if necessary

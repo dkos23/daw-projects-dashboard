@@ -21,7 +21,7 @@ async function extractBitwigMetadata(filePath) {
       tempo = parseFloat(tempoTag.$.value); // Extract the tempo value as a float
     } else {
       // throw new Error('Tempo not found in project.xml');
-      console.warn(`Tempo not found in project.xml`);
+      console.warn(`extractBitwigMetadata: Tempo not found in project.xml`);
     }
 
     // Extract <Track> nodes and count their contentType
@@ -32,7 +32,7 @@ async function extractBitwigMetadata(filePath) {
       const structureNode = parsedData?.Project?.Structure?.[0];
       if (!structureNode || !structureNode.Track) {
         // throw new Error('Tracks not found in project.xml');
-        console.warn(`Tracks not found in project.xml`);
+        console.warn(`extractBitwigMetadata: Tracks not found in project.xml`);
       }
       const tracks = structureNode.Track;
       midiTracks = tracks.filter(track => track.$?.contentType === "notes").length;
@@ -44,11 +44,11 @@ async function extractBitwigMetadata(filePath) {
     return {
       tempo: tempo,
       trackCounts,
-      projectName: parsedData?.Project?.Application?.[0]?.$.name || "Unknown",
-      author: "N/A",
+      projectName: parsedData?.Project?.Application?.[0]?.$.name || null,
+      author: null,
     };
   } catch (error) {
-    console.error(`Error extracting Bitwig metadata: ${error.message}`);
+    console.error(`extractBitwigMetadata: Error extracting Bitwig metadata: ${error.message}`);
     return null;
   }
 }

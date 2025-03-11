@@ -1,11 +1,13 @@
 const fs = require("fs");
+const path = require("path");
+const xml2js = require("xml2js");
 const fsPromises = require("fs/promises");
 const unzipper = require("unzipper");
 const { parseStringPromise } = require("xml2js");
 
 const config = require("../../public/app_config.js");
 
-// Function to extract metadata from Cubase .cpr files
+// Function to extract metadata from Cubase .xml files
 async function extractCubaseMetadata(filePath) {
   let tempo = null;
   let scaleInfo = {
@@ -15,40 +17,58 @@ async function extractCubaseMetadata(filePath) {
   let trackCounts = {
     midiTracks: 0,
     audioTracks: 0,
-    returnTracks: 0
+    returnTracks: 0,
   };
 
   try {
-    // parseRIFF(filePath);
+    // Get the directory of the file
+    const directoryPath = path.dirname(filePath);
 
-    const buffer = fs.readFileSync(filePath);
+    // Get all files in the directory
+    const files = fs.readdirSync(directoryPath);
 
-    // Convert binary buffer to a string to find readable sections
-    const fileString = buffer.toString("utf8");
+    // Filter XML files
+    const xmlFiles = files.filter((file) => file.endsWith(".xml"));
 
-    // Attempt to locate XML-like sections or keywords
-    const xmlStart = fileString.indexOf("<");
-    if (xmlStart !== -1) {
-      const xmlData = fileString.slice(xmlStart);
-
-      // Use an XML parser if applicable
-      const xml2js = require("xml2js");
-      const parser = new xml2js.Parser();
-
-      parser
-        .parseStringPromise(xmlData)
-        .then((result) => {
-          console.log(
-            "Extracted XML Metadata:",
-            JSON.stringify(result, null, 2)
-          );
-        })
-        .catch((err) => {
-          console.error("Error parsing XML:", err.message);
-        });
-    } else {
-      console.error("No XML-like metadata found in the file.");
+    if (xmlFiles.length === 0) {
+      // console.error("No XML files found in the directory.");
+      return null;
     }
+
+    let parsedXml = null;
+    let found = false;
+
+    // Search for the XML file containing the "tracklist" node
+    for (const xmlFile of xmlFiles) {
+      const fullPath = path.join(directoryPath, xmlFile);
+
+      try {
+        // Read the XML file
+        const xmlContent = fs.readFileSync(fullPath, "utf8");
+
+        // Parse the XML
+        const parser = new xml2js.Parser();
+        const result = await parser.parseStringPromise(xmlContent);
+
+        // Check if the "tracklist" node exists
+        if (result?.tracklist) {
+          parsedXml = result;
+          found = true;
+          console.log(`extractCubaseMetadata: Found 'tracklist' in: ${xmlFile}`);
+          break;
+        }
+      } catch (err) {
+        console.error(`extractCubaseMetadata: Error parsing ${xmlFile}: ${err.message}`);
+      }
+    }
+
+    if (!found) {
+      console.error("extractCubaseMetadata: No valid XML file with 'tracklist' found.");
+      return null;
+    }
+
+    // Extract track counts using the helper function
+    trackCounts = findCubaseTrackCounts(parsedXml);
 
     return {
       tempo,
@@ -58,9 +78,7 @@ async function extractCubaseMetadata(filePath) {
       author: null,
     };
   } catch (error) {
-    console.error(
-      `Error extracting metadata from Cubase project: ${error.message}`
-    );
+    console.error(`extractCubaseMetadata: Error extracting metadata from Cubase project: ${error.message}`);
     return null;
   }
 }
@@ -120,6 +138,52 @@ function findTempoInCubaseXml(xmlStructure) {
     }
   }
   return null;
+}
+
+/**
+ * 
+ * @param {*} xmlStructure 
+ * @returns {Object using shorthand property names}
+ */
+function findCubaseTrackCounts(xmlStructure) {
+  if (!xmlStructure || typeof xmlStructure !== "object") {
+    return { midiTracks: 0, audioTracks: 0, returnTracks: 0 };
+  }
+
+  // Navigate to the <tracklist> and extract the <list name="track">
+  const tracklist = xmlStructure?.tracklist;
+  if (!tracklist) {
+    console.error("findCubaseTrackCounts: Tracklist node not found");
+    return { midiTracks: 0, audioTracks: 0, returnTracks: 0 };
+  }
+
+  const trackNodes = tracklist?.list?.filter((node) => node.$?.name === "track") || [];
+  if (trackNodes.length === 0) {
+    console.warn("findCubaseTrackCounts: No tracks found in the tracklist");
+    return { midiTracks: 0, audioTracks: 0, returnTracks: 0 };
+  }
+
+  // Extract and count MIDI, Audio, and Return tracks
+  let midiTracks = 0;
+  let audioTracks = 0;
+  let returnTracks = 0;
+
+  trackNodes.forEach((trackNode) => {
+    const trackObjects = trackNode?.obj || [];
+    trackObjects.forEach((track) => {
+      const trackClass = track.$?.class;
+
+      if (trackClass === "MMidiTrackEvent") {
+        midiTracks++;
+      } else if (trackClass === "MAudioTrackEvent") {
+        audioTracks++;
+      } else if (trackClass === "MReturnTrackEvent") {
+        returnTracks++;
+      }
+    });
+  });
+
+  return { midiTracks, audioTracks, returnTracks };
 }
 
 module.exports = { extractCubaseMetadata };
