@@ -3,10 +3,10 @@ import { Container, Typography, Box, AppBar, Toolbar, IconButton, Menu, MenuItem
 import MenuIcon from '@mui/icons-material/Menu';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useRouter } from 'next/router'; 
+import { useLanguage } from "../context/LanguageContext";
 // import ProjectTrackTable from './ProjectTrackTable';
 import DawProjectsTable from './DawProjectsTable';
 import styles from '../styles/DawDashboard.module.css';
-import strings from '../../locales/strings'; 
 
 // Create a dark theme using Material-UI
 const darkTheme = createTheme({
@@ -22,23 +22,18 @@ const darkTheme = createTheme({
   },
 });
 
-const DawDashboard = ({ language }) => {
-  // const [language, setLanguage] = useState('en');
+const DawDashboard = () => {
+  const { language, strings } = useLanguage();
+  const langStrings = strings?.[language] || strings['en'] || {};
   const [anchorEl, setAnchorEl] = useState(null);
   const router = useRouter(); // Initialize the Next.js router
 
-  const langStrings = strings[language] || strings['en'];
-
-  // useEffect(() => {
-  //   // Ensure that this code only runs on the client-side
-  //   if (typeof window !== 'undefined') {
-  //   }
-  // }, []);
 
   // Update the window title when the component mounts
   useEffect(() => {
-    document.title = langStrings.appName;
-  }, [langStrings]); // Adding langStrings as a dependency ensures it updates when language changes
+    document.title = langStrings?.appName;
+    // console.log("🟢 [DASHBOARD] Language Updated:", language);
+  }, [langStrings]);
   
 
   const handleMenuOpen = (event) => {
@@ -75,7 +70,7 @@ const DawDashboard = ({ language }) => {
 
             {/* Title */}
             <Typography variant="h6" className={styles['title']}>
-              {langStrings.home}
+              {langStrings?.home}
             </Typography>
 
             {/* Additional Menu */}
@@ -94,11 +89,13 @@ const DawDashboard = ({ language }) => {
 
         <Container maxWidth="false" className={styles['dashboard-content']}>
           <Typography variant="h1" className={styles['dashboard-header']}>
-            {langStrings.appName}
+            {langStrings?.appName}
           </Typography>
 
           {/* DawProjectsTable class component */}
-          <DawProjectsTable language={language} />
+          {/* <DawProjectsTable language={language} /> */}
+          {/* Pass language as prop to update child components */}
+          <DawProjectsTable />
 
           {/* Pass the track data as props to the ProjectTrackTable class component */}
           {/* <ProjectTrackTable audioTracks={AudioTrack} midiTracks={MidiTrack} /> */}

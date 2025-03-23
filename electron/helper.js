@@ -5,10 +5,10 @@ const unzipper = require('unzipper');
 const xml2js = require("xml2js");
 const stream = require('stream');
 // const Transform = require('stream');
-const { gunzip } = require("zlib");
-const { promisify } = require("util");
+// const { gunzip } = require("zlib");
+// const { promisify } = require("util");
 const { exec } = require("child_process");
-const { parseStringPromise } = require('xml2js');
+// const { parseStringPromise } = require('xml2js');
 const { Parser } = require("json2csv");
 
 const config = require('../public/app_config.js');

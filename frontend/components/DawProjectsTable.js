@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, TextField, TableSortLabel, Box, CircularProgress, Button, Snackbar } from '@mui/material';
 import TreeViewModal from './TreeViewModal';
+import { useLanguage } from "../context/LanguageContext";
 import styles from '../styles/DawProjectsTable.module.css';
-import strings from '../../locales/strings';
 
 // DEV use mocked data !!!!
 // import mockProjects from '../../public/data/MockProjects';
@@ -31,23 +31,41 @@ class DawProjectsTable extends Component {
   }
 
   componentDidMount() {
-    const selectedDAW = localStorage.getItem('selectedDAW') || 'Ableton';
+    this.updateFileExtension();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const savedDAW = typeof window !== "undefined" ? localStorage.getItem('selectedDAW') : null;
+    const currentFileExtension = this.getFileExtension(savedDAW);
+  
+    // Only update if fileExtension has changed
+    if (currentFileExtension !== prevState.fileExtension) {
+      this.setState({ fileExtension: currentFileExtension }, this.fetchProjectFiles);
+    }
+  }
+
+  updateFileExtension() {
+    const selectedDAW = typeof window !== "undefined" ? localStorage.getItem('selectedDAW') : null;
     let fileExtension = '.als';
 
-    if (selectedDAW === 'StudioOne') {
-      fileExtension = '.song';
-    } else if (selectedDAW === 'Bitwig') {
-      fileExtension = '.bwproject';
-    } else if (selectedDAW === 'Cubase') {
-      fileExtension = '.cpr';
-    } else if (selectedDAW === 'AkaiMPC') {
-      fileExtension = '.xpj';
+    switch (selectedDAW) {
+      case 'StudioOne': fileExtension = '.song'; break;
+      case 'Bitwig': fileExtension = '.bwproject'; break;
+      case 'Cubase': fileExtension = '.cpr'; break;
+      case 'AkaiMPC': fileExtension = '.xpj'; break;
+      default: fileExtension = '.als';
     }
+    this.setState({ fileExtension }, this.fetchProjectFiles);
+  }
 
-    // Ensure setState is done before calling fetchProjectFiles
-    this.setState({ fileExtension }, () => {
-      this.fetchProjectFiles();  // Call fetchProjectFiles after the state is updated
-    });
+  getFileExtension(selectedDAW) {
+    switch (selectedDAW) {
+      case 'StudioOne': return '.song';
+      case 'Bitwig': return '.bwproject';
+      case 'Cubase': return '.cpr';
+      case 'AkaiMPC': return '.xpj';
+      default: return '.als';
+    }
   }
 
   openTreeViewModal() {
@@ -118,7 +136,6 @@ class DawProjectsTable extends Component {
 
       // Fetch the file extension from state
       const { fileExtension } = this.state;
-      const { language } = this.props;
 
       console.log('Using START_PATH:', startPath + ' - File extension: ' + fileExtension);
 
@@ -130,7 +147,7 @@ class DawProjectsTable extends Component {
         // const formattedDate = `${fileDate.getFullYear()}.${String(fileDate.getMonth() + 1).padStart(2, '0')}.${String(
         //   fileDate.getDate()
         // ).padStart(2, '0')}`;
-        const formattedDate = new Intl.DateTimeFormat(language, {
+        const formattedDate = new Intl.DateTimeFormat(this.props.language, {
           year: 'numeric',
           month: '2-digit',
           day: '2-digit',
@@ -154,7 +171,6 @@ class DawProjectsTable extends Component {
               : notAvailableEmoji;
             break;
           case ".xpj":
-            console.log("case xpj");
             trackCounts = `${file.trackCounts || notAvailableEmoji}`;
             break;
           case ".cpr":
@@ -253,10 +269,9 @@ class DawProjectsTable extends Component {
 
   render() {
     const { projects, searchTerm, sortConfig, loading, fileCount, showTreeViewModal, csvExportSuccess } = this.state;
-    const { language } = this.props;
+    const { strings, language } = this.props; // Get strings from props (passed by wrapper)
+    const langStrings = strings[language] || strings["en"];
 
-    // Dynamically load strings based on the selected language
-    const langStrings = strings[language] || strings['en'];
     // Apply both filtering and sorting to projects
     const filteredProjects = this.getFilteredProjects(projects);
     const sortedProjects = this.getSortedProjects(filteredProjects);
@@ -428,4 +443,10 @@ class DawProjectsTable extends Component {
   }
 }
 
-export default DawProjectsTable;
+// Wrap the class component in a functional component to use the language context
+const DawProjectsTableWrapper = () => {
+  const { language, strings } = useLanguage(); // Get global language state
+  return <DawProjectsTable language={language} strings={strings} />;
+};
+
+export default DawProjectsTableWrapper;

@@ -3,7 +3,7 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, useMediaQuer
 import TreeView from './TreeView';  // Assuming TreeView is in the same folder
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import styles from '../styles/TreeViewModal.module.css';
-import strings from '../../locales/strings';
+import strings from '../../public/locales/strings';
 
 const darkTheme = createTheme({
   palette: {

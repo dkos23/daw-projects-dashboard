@@ -40,8 +40,6 @@ module.exports = {
         "Windows\\WinSxS", 
         "Windows\\Logs"
       ],
-
-    // MIDI RootNote to Note mapping
     MIDI_NOTE_MAPPING: {
       0: "C",
       1: "C#",
@@ -72,8 +70,7 @@ module.exports = {
       "12": "Blues",
       "13": "Gypsy",
       "14": "Arabic",
-      "15": "Japanese",
-      // Extend with other scales as needed
+      "15": "Japanese"
     },
   };
   

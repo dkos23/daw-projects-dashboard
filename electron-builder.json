@@ -19,6 +19,14 @@
       "from": "public/icons",
       "to": "icons",
       "filter": ["**/*"]
+    },
+    {
+      "from": "public/app_config.json",
+      "to": "app_config.json"
+    },
+    {
+      "from": "public/locales/strings.json",
+      "to": "locales/strings.json"
     }
   ],
   "publish": [

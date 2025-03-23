@@ -17,8 +17,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import styles from "../frontend/styles/Settings.module.css";
-import strings from '../locales/strings';
-// import config from '../public/app_config.js';
+import { useLanguage } from "../frontend/context/LanguageContext";
 
 // Create a dark theme using Material-UI
 const darkTheme = createTheme({
@@ -34,53 +33,37 @@ const darkTheme = createTheme({
   },
 });
 
-const Settings = ({ language }) => {
+const Settings = () => {
+  const { language, changeLanguage, strings } = useLanguage();
   const [startPath, setStartPath] = useState("");
   const [startPathError, setStartPathError] = useState('');
   const [donationAmount, setDonationAmount] = useState("");
   const [daw, setDaw] = useState("");
-  const [selectedLanguage, setSelectedLanguage] = useState(language || "en");
   const router = useRouter();
-  const langStrings = strings[language] || strings['en'];
+
+  // Log
+  // useEffect(() => {
+  //   console.log("🟢 [SETTINGS] daw:", daw);
+  // }, [daw]);
 
   // hook to load and save stuff
   useEffect(() => {
-    const savedStartPath = localStorage.getItem('startPath');
-    const savedDaw = localStorage.getItem('selectedDAW');
-    const savedLanguage = localStorage.getItem("language");
+    const savedStartPath = typeof window !== "undefined" ? localStorage.getItem("startPath") : null;
+    const savedDaw = typeof window !== "undefined" ? localStorage.getItem("selectedDAW") : null;
 
-    if (savedStartPath) {
-      setStartPath(savedStartPath); // Load saved START_PATH if exists
-    }
+    if (savedStartPath) setStartPath(savedStartPath);
+    if (savedDaw) setDaw(savedDaw);
 
-    if (savedDaw) {
-      setDaw(savedDaw);
-    }
-
-    if (savedLanguage) {
-      setSelectedLanguage(savedLanguage);
-    }
-
-    // Set document title based on the current language
-    document.title = langStrings.settingsPageTitle;
-  }, []);
+    // console.log("🟢 [SETTINGS] Loaded Language:", language);
+  }, [language]);
 
   const validateStartPath = (path) => {
-    if (!path) {
-      return langStrings.startPathEmpty; // Error if empty
-    }
-    // You can add more complex validation logic for file paths if necessary
-    if (!/^[A-Za-z]:[\\/]/.test(path)) {
-      return langStrings.invalidPath;
-    }
-    return ''; // No error
+    if (!path) return strings[language]?.startPathEmpty || "Start path cannot be empty";
+    if (!/^[A-Za-z]:[\\/]/.test(path)) return strings[language]?.invalidPath || "Invalid path format.";
+    return "";
   };
 
   const validateDonationAmount = (amount) => {
-    // if (!amount) {
-    //   return "Thank you for entering amount > 5 :)";
-    // }
-
     if (amount <= 5) {
       return "For negative amount YOU do not get payed :)";
     }
@@ -89,9 +72,7 @@ const Settings = ({ language }) => {
 
   const handleLanguageChange = (event) => {
     const newLanguage = event.target.value;
-    setSelectedLanguage(newLanguage);
-    localStorage.setItem("language", newLanguage); // Save selected language to localStorage
-    window.location.reload(); // Reload the app to apply changes
+    changeLanguage(newLanguage); // Update language globally
   };
 
   const handleSave = () => {
@@ -109,7 +90,6 @@ const Settings = ({ language }) => {
     } else {
       // Save the START_PATH to local storage
       localStorage.setItem('startPath', startPath);
-      
       localStorage.setItem('donationAmount', donationAmount);
       
       if (!daw) {
@@ -142,19 +122,19 @@ const Settings = ({ language }) => {
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6" className={styles["title"]}>
-              {langStrings.home}
+              {strings[language]?.home || "Home"}
             </Typography>
           </Toolbar>
         </AppBar>
 
         <Box className={styles["settings-content"]}>
           <Typography variant="h1" className={styles["settings-header"]}>
-            {langStrings.settings}
+            {strings[language]?.settings || "Settings"}
           </Typography>
 
           {/* Input field for START_PATH */}
           <TextField
-            label={langStrings.enterStartPath}
+            label={strings[language]?.enterStartPath || "Enter your Start Folder"}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -170,11 +150,11 @@ const Settings = ({ language }) => {
 
           {/* DAW Dropdown Selection */}
           <FormControl fullWidth margin="normal" className={styles["settings-input"]}>
-            <InputLabel>{langStrings.selectDaw}</InputLabel>
+            <InputLabel>{strings[language]?.selectDaw || "Select your DAW"}</InputLabel>
             <Select
               value={daw}
-              label={langStrings.selectDaw}
-              onChange={(e) => setDaw(e.target.value)}  // Set the selected DAW
+              // label={langStrings.selectDaw}
+              onChange={(e) => setDaw(e.target.value)}
               style={{ color: 'white' }}  // White text for dark mode
             >
               <MenuItem value="Ableton">Ableton</MenuItem>
@@ -187,17 +167,11 @@ const Settings = ({ language }) => {
 
           {/* Language Dropdown Selection */}
           <FormControl fullWidth margin="normal" className={styles["settings-input"]}>
-            <InputLabel>{langStrings.selectLanguage}</InputLabel>
-            <Select
-              value={selectedLanguage}
-              label={langStrings.selectLanguage}
-              onChange={handleLanguageChange}
-              style={{ color: 'white' }}  // White text for dark mode
-            >
-              <MenuItem value="en">{langStrings.english}</MenuItem>
-              <MenuItem value="es">{langStrings.spanish}</MenuItem>
-              {/* <MenuItem value="fr">Français</MenuItem> */}
-              <MenuItem value="de">{langStrings.german}</MenuItem>
+            <InputLabel>{strings[language]?.selectLanguage || "Select your language"}</InputLabel>
+            <Select value={language} onChange={handleLanguageChange} style={{ color: 'white' }}>
+              <MenuItem value="en">{strings[language]?.english || "English"}</MenuItem>
+              <MenuItem value="es">{strings[language]?.spanish || "Spanish"}</MenuItem>
+              <MenuItem value="de">{strings[language]?.german || "German"}</MenuItem>
             </Select>
           </FormControl>
 
@@ -224,14 +198,18 @@ const Settings = ({ language }) => {
             onClick={handleSave}
             className={styles["save-button"]}
           >
-            {langStrings.saveButton}
+            {strings[language]?.saveButton || "Save Settings"}
           </Button>
+
+          {/* <Button variant="contained" color="primary" onClick={() => router.push('/')} className={styles["save-button"]}>
+            {strings[language]?.saveButton || "Save Settings"}
+          </Button> */}
         </Box>
 
         {/* Footer Section */}
         <Box component="footer" className={styles["footer"]}>
           <Typography variant="body2" align="center">
-            DAW Projects Dashboard v1.0
+            DAW Projects Dashboard v1.0.0
             <br />
             Developed by @CoreSignal
             <br />© 2025

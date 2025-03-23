@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Menu, ipcMain, shell } = require('electron');
 const path = require('path');
+const fs = require("fs");
 const { searchFiles, openExplorer, exportToCsv } = require('./helper'); // Import helper functions
 
 let mainWindow;
@@ -31,7 +32,6 @@ function createWindow() {
     ? `file://${path.join(__dirname, '../out/settings.html')}`
     : 'http://localhost:3000/settings';
 
-  
   mainWindow.loadURL(startUrl);
 
   // Send system locale to renderer process
@@ -103,6 +103,50 @@ function createWindow() {
   });
 }
 
+// Ensure app is ready before handling any IPC requests
+app.whenReady().then(() => {
+  console.log("✅ Electron App Ready");
+  createWindow();
+});
+
+ipcMain.handle("is-packaged", () => {
+  return app.isPackaged;
+});
+
+ipcMain.handle("read-file", async (event, filePath) => {
+  try {
+    const content = fs.readFileSync(filePath, "utf8");
+    return content;
+  } catch (error) {
+    console.error("🔴 Error reading file:", error);
+    return "{}";
+  }
+});
+
+// IPC: Get correct file path (Dev vs. Packaged)
+ipcMain.handle("get-path", (event, file) => {
+  try {
+    const basePath = app.isPackaged
+      ? path.join(process.resourcesPath, "locales")  // Packaged app location
+      : path.join(__dirname, "..", "public", "locales"); // Dev mode location
+
+    const finalPath = path.join(basePath, file);
+    console.log(`📂 Resolving path: ${finalPath}`);
+    return finalPath;
+  } catch (error) {
+    console.error('🔴 Error in get-path:', error);
+    return null;
+  }
+});
+
+// IPC: Reload Electron Window
+ipcMain.on('reload-window', () => {
+  if (mainWindow) {
+    console.log("🔄 Reloading Window");
+    mainWindow.reload();
+  }
+});
+
 // IPC handler to search for eg:Ableton .als files
 ipcMain.handle('search-files', async (event, searchPath, extension) => {
   try {
@@ -146,7 +190,7 @@ ipcMain.handle('get-icon-path', () => {
   }
 });
 
-app.whenReady().then(createWindow);
+// app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
