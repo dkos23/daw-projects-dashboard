@@ -136,7 +136,7 @@ class DawProjectsTable extends Component {
           day: '2-digit',
         }).format(fileDate);
 
-        console.log('formattedDate:', formattedDate);
+        // console.log('formattedDate:', formattedDate);
 
         // Concatenate root note and scale name for display in one column
         const scaleInfo = file.scaleInfo
@@ -169,7 +169,7 @@ class DawProjectsTable extends Component {
         //   ? `MIDI: ${file.trackCounts.midiTracks}\nAudio: ${file.trackCounts.audioTracks}\nReturn: ${file.trackCounts.returnTracks}`
         //   : notAvailableEmoji;
 
-        console.log("fetchProjectFiles" + JSON.stringify(file,null,2));
+        // console.log("fetchProjectFiles" + JSON.stringify(file,null,2));
         
 
         return {
